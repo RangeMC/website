@@ -1,0 +1,7 @@
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/alexeyle/rangemc.ovh_prod"
+PassengerBaseURI "/"
+PassengerNodejs "/home/alexeyle/nodevenv/rangemc.ovh_prod/10/bin/node"
+PassengerAppType node
+PassengerStartupFile index.js
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
