@@ -1,0 +1,18 @@
+<%- include('../_header.ejs', { title: `Личный кабинет`, userLogin: userLogin }) %>
+<div class="text-center">
+    <span class="white-color">
+        <div id="head" class="parallax">
+            <h1>RangeMC Project</h1>
+            <h3>Комплекс серверов Minecraft</h3>
+        </div>
+        <br><div style="padding: 20px 20px 20px 20px; background-color: black; color: white;">
+            <center><p>
+                Привет, <b><%- account.login %></b>!
+                <br>Ваш ранг: <b><%- userGroups[userGroup[0][0].primary_group] %></b>
+                <br><br><%- (["admin"].includes(userGroup[0][0].primary_group)) ? `<a href="/panel/admin" class="btn">Админ-панель</a> ` : "" %><a href="/panel/list" class="btn">Список игроков</a> <a style="background-color: green;" href="/panel/download" class="btn">Скачать лаучнер</a> <a href="/panel/password" class="btn">Сменить пароль</a> <a href="/panel/skin" class="btn">Сменить скин</a> <a href="/panel/cloak" class="btn">Сменить плащ</a> <a style="background-color: red;" href="/panel/logout" class="btn">Выйти из аккаунта</a>
+            </p></center>
+        </div>
+    </span>
+    <section id="banner" class="parallax"></section>
+</div>
+<%- include('../_footer.ejs') %>

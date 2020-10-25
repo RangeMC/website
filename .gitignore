@@ -1,0 +1,15 @@
+logs
+*.log
+npm-debug.log*
+node_modules/
+package-lock.json
+.npm/
+.git/
+.vscode/
+.env
+!/skins/
+/skins/**
+!/skins/default.png
+!/cloaks/
+/cloaks/**
+!/cloaks/default.png

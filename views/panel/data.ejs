@@ -1,0 +1,19 @@
+<%- include('../_header.ejs', { title: `Данные аккаунта`, userLogin: userLogin }) %>
+<div class="text-center">
+    <span class="white-color">
+        <div id="head" class="parallax">
+            <h1>RangeMC Project</h1>
+            <h3>Комплекс серверов Minecraft</h3>
+        </div>
+        <br><div style="padding: 20px 20px 20px 20px; background-color: black; color: white;">
+            <p>
+                Логин аккаунта: <b>[ID <%- account.id %>] <%- account.login %></b>
+                <br>Ранг игрока: <b><%- (account.access == 0) ? "Игрок" : (account.access == 1) ? "Хелпер" : (account.access == 2) ? "Модератор" : (account.access == 3) ? "Администратор" : (account.access == 4) ? "Разработчик" : "Неизвестный" %></b>
+                <br>Ключ сессии аккаунта: <b><%- account.lk_cookie %></b> (передавайте только боту <b>RangeMC</b> в <a target="_blank" href="/discord"><b>Discord</b></a>)
+                <br><br><a style="background-color: red;" href="/panel" class="btn">Вернуться в меню</a>
+            </p>
+        </div>
+    </span>
+    <section id="banner" class="parallax"></section>
+</div>
+<%- include('../_footer.ejs') %>

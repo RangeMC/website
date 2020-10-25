@@ -1,0 +1,50 @@
+<%- include('../_header.ejs', { title: `Ошибка`, userLogin: userLogin }) %>
+<div class="text-center">
+    <span class="white-color">
+        <div id="head" class="parallax">
+            <h1>RangeMC Project</h1>
+            <h3>Комплекс серверов Minecraft</h3>
+        </div>
+        <br><div style="background-color: black;" class="w-50 mx-auto window breakpoint-768-i">
+            <% if(type == "deactivated") { %>
+                <p><b style="color: white;">Ваш аккаунт деактивирован администрацией.</b></p><br>
+                <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/z9fiN1Nr_4I?controls=0"&autoplay=1 frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
+            <% } %>
+            <% if(type == "503") { %>
+                <p><b style="color: white;">503 Service Unavailable</b><br>Вот чё ты тут шумишь? Не видишь сайт наелся и спит, Гарри.</p><br>
+                <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/XGVlfWp4zCs?controls=0&autoplay=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
+            <% } %>
+            <% if(type == "204") { %>
+                <p><b style="color: white;">204 No Content</b></p><br>
+                <img width="560" height="315" src="https://sun1-86.userapi.com/plZABq5YKaN9-omRag11py_3_Gs-vQz6HQj9xA/UhmqfgXJCNo.jpg">
+            <% } %>
+            <% if(type == "500") { %>
+                <p><b style="color: white;">500 Internal Server Error</b><br>Видимо кто-то из администрации что-то натворил..</p><br>
+                <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/DTRJC139pAQ?controls=0&autoplay=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
+            <% } %>
+            <% if(type == "409") { %>
+                <p><b style="color: white;">409 Conflict</b></p><br>
+                <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/x-nsRaE6bEo?controls=0&autoplay=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
+            <% } %>
+
+            <% if(type == "404") { %>
+                <p><b style="color: white;">404 Not Found</b></p><br>
+                <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/***?controls=0&autoplay=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
+            <% } %>
+            <% if(type == "524") { %>
+                <p><b style="color: white;">524 A Timeout Occurred</b></p><br>
+                <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/***?controls=0&autoplay=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
+            <% } %>
+            <% if(type == "deleteUser") { %>
+                <p><b style="color: white;">Произошла ошибка при удалении аккаунта, но в любом случае..</b></p><br>
+                <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/***?controls=0&autoplay=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
+            <% } %>
+            <% if(type == "lostpass") { %>
+                <p><b style="color: white;">Забыли пароль от своего аккаунта?</b></p><br>
+                <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/h8SmZDYjIHU?controls=0&autoplay=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
+            <% } %>
+        </div>
+    </span>
+    <section id="banner" class="parallax"></section>
+</div>
+<%- include('../_footer.ejs') %>

@@ -1,0 +1,37 @@
+<%- include('../_header.ejs', { title: `Регистрация`, userLogin: userLogin }) %>
+<%- captcha %>
+<div class="text-center">
+    <span class="white-color">
+        <div id="head" class="parallax">
+            <h1>RangeMC Project</h1>
+            <h3>Комплекс серверов Minecraft</h3>
+        </div>
+        <br><form action="/panel/register" method="POST"><div style="background-color: black;" class="w-50 mx-auto window breakpoint-768-i">
+            <div class="text-center"><h4 style="color: white;">Регистрация</h4></div>
+            <%- (error) ? `<div id="error-login"><br><p style="background-color: red;" class="btn" onclick="document.getElementById('error-login').innerHTML = '';">${error}</p><br></div>` : "" %>
+            <div class="input-block pt-20">
+                <label style="color: white;" for="form-1">Логин аккаунта</label>
+                <input type="text" placeholder="Введите ваш никнейм в игре" name="login" id="form-1" required>
+                <div style="color: white;" class="input-helper">Данное поле является обязательным</div>
+            </div>
+
+            <div class="input-block">
+                <label style="color: white;" for="form-2">Пароль аккаунта</label>
+                <input type="password" placeholder="Введите пароль для входа в нашем лаунчере" name="pass" id="form-2" required>
+                <div style="color: white;" class="input-helper">Данное поле является обязательным</div>
+            </div>
+
+            <div class="input-block" style="display: none">
+                <label style="color: white;" for="form-2">ReCaptcha-токен</label>
+                <input type="password" placeholder="Подождите..." name="g-recaptcha-response" id="form-3" required readonly onclick="alert('Пожалуйста, не трогайте это поле. Данные в нём используется для обмена информацией с Google ReCaptcha.')">
+                <div style="color: white;" class="input-helper">Данное поле является обязательным</div>
+            </div>
+
+            <div class="pt-20 text-center">
+                <button type="submit" style="background-color: cadetblue;" class="btn">Зарегистрироваться</button> <a style="background-color: cornflowerblue;" class="btn" href="/panel/login">Авторизация</a>
+            </div>
+        </div></form>
+    </span>
+    <section id="banner" class="parallax"></section>
+</div>
+<%- include('../_footer.ejs') %>
