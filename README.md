@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 `login` text NOT NULL, 
 `pass` text NOT NULL, 
 `vk` varchar(300) NOT NULL DEFAULT '0', 
+`balance` varchar(255) DEFAULT NULL, 
 `lk_cookie` text, 
 `discord` text, 
 `blocked` int(11) NOT NULL DEFAULT '0', 
