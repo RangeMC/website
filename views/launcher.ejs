@@ -1,4 +1,4 @@
-<%- include('../_header.ejs', { title: `Скачать лаунчер`, userLogin: userLogin }) %>
+<%- include('_header.ejs', { title: `Скачать лаунчер`, userLogin: userLogin }) %>
 <div class="text-center">
     <span class="white-color">
         <div id="head" class="parallax">
@@ -7,9 +7,8 @@
         </div>
         <br><div style="background-color: black;" class="w-50 mx-auto window breakpoint-768-i">
             <div class="text-center"><h4 style="color: white;">Скачать лаунчер</h4></div>
-            <%- (error) ? `<div id="error-login"><br><p style="background-color: red;" class="btn" onclick="document.getElementById('error-login').innerHTML = '';">${error}</p><br></div>` : "" %>
             <div class="input-block pt-20">
-                <center><a style="color: white;">Инструкцию по запуску лаунчера можно посмотреть здесь: </a><a target= "_blank" href="https://vk.com/@rangemc-launcher">клик</a></center>
+                <center><a style="color: white;">Инструкцию по использованию лаунчера можно посмотреть здесь: </a><a target= "_blank" href="https://wiki.rangemc.ovh/launcher/usage">клик</a></center>
             </div>
             <center><a style="color: white;">Выберите платформу:</a></center>
             <div class="pt-20 text-center">
@@ -19,4 +18,4 @@
     </span>
     <section id="banner" class="parallax"></section>
 </div>
-<%- include('../_footer.ejs') %>
+<%- include('_footer.ejs') %>

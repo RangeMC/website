@@ -86,7 +86,9 @@ app.get("/bans", (req, res) => {
         });
     });
 });
-        
+app.get("/launcher", (req, res) => {
+    res.render("launcher", { userLogin: req.cookies.userLogin || "Личный кабинет" });
+});   
 
 app.use((req, res, next) => {
     res.status(404).render("error", { error: 404, errorProcessed: "Страница не найдена, дурашка. >:C", userLogin: req.cookies.userLogin || "Личный кабинет" });

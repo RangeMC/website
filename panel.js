@@ -145,18 +145,7 @@ router.get("/cloak", (req, res) => {
 });
 
 router.get("/download", (req, res) => {
-    if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    account.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
-        .then((user) => {
-            if(!user[0][0]) {
-                res.cookie("loginHash", null, { maxAge: -1 });
-                res.cookie("userLogin", null, { maxAge: -1 });
-                return res.redirect("/panel/login");
-            } else {
-                if(req.query.error) return res.render("panel/download", { error: errorProcess(req.query.error), userLogin: req.cookies.userLogin || "Личный кабинет" });
-                else return res.render("panel/download", { error: null, userLogin: req.cookies.userLogin || "Личный кабинет" });
-            }
-        }).catch(console.error);
+    return res.redirect("/../launcher");
 });
 
 router.get("/admin", (req, res) => {
