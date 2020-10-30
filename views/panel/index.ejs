@@ -10,6 +10,35 @@
                 Привет, <b><%- account.login %></b>!
                 <br>Ваш основной ранг: <b><%- userGroups[userGroup[0][0].primary_group] %></b>
                 <br>Ваш баланс - <b><%- account.balance %></b> монеток.
+                <% bans.forEach((user) => { %>
+                    <% if (user.time == 0) { %>
+                      <% var perm = "никогда не закончится"; %>
+                      <% } else { %>
+                        <% var enddate = moment(new Date(Number(user.time))).utcOffset(3).locale('ru').format('lll'); %>
+                        <% } %>
+                        <% if (user.punishmentType == "BAN") { %>
+                            <% var ban = "бан"; %>
+                            <% }%>
+                              <% if (user.type == "TEMPBAN") { %>
+                                <% var type = "временная блокировка"; %>
+                                <% var ending = ", которая закончится в " + enddate; %>
+                                <% var color = "color: orange;"; %>
+                                <% var info = "Чтобы убрать статус временной блокировки из личного кабинета и списка наказаний, после её окончания вам необходимо хоть раз зайти на сервер." %>
+                                 <% }%>
+                                 <% if (user.type == "BAN") { %>
+                                    <% var type = "постоянная блокировка"; %>
+                                    <% var color = "color: red;"; %>
+                                    <% var info = "Данную блокировку может снять только персонал проекта. Если вы считаете что это ошибка, обратитесь в нашу группу ВКонтакте." %>
+                                     <% }%>
+                                        <% if (user.reason == null) { %>
+                                        <% var srvundef = "неизвестно"; %>
+                                        <% }%>
+                                            <% if (user.admin == "CONSOLE") { %>
+                                            <% var srvconsole = "консолью"; %>
+                                                <% }%>
+                <br><br><a style="<%- color %>">У вас имеется <%- type || "неизвестная" %>, выданная <%- srvconsole || user.admin || "неизвестным игроком" %> в <%- moment(new Date(Number(user.expire))).utcOffset(3).locale('ru').format('lll') || "неизвестно" %> за <%- "нарушение правила " + user.reason || "неизвестно" %><%- ending || "." %></a>
+                <br><a style="<%- color %>"><%- info %></a>
+                <% }); %>
                 <br><br><%- (["admin"].includes(userGroup[0][0].primary_group)) ? `<a href="/panel/admin" class="btn">Админ-панель</a> ` : "" %><a href="/panel/list" class="btn">Список игроков</a> <a style="background-color: green;" href="/launcher" class="btn">Скачать лаучнер</a> <a href="/panel/password" class="btn">Сменить пароль</a> <a href="/panel/skin" class="btn">Сменить скин</a> <a href="/panel/cloak" class="btn">Сменить плащ</a> <a style="background-color: red;" href="/panel/logout" class="btn">Выйти из аккаунта</a>
             </p></center>
         </div>

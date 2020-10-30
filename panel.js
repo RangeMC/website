@@ -43,6 +43,7 @@ const multerConfig = (str) => ({
 const uploadSkin = multer(multerConfig(storages.skins)).single("skin");
 const uploadCloak = multer(multerConfig(storages.cloaks)).single("cloak");
 
+const moment = require("moment");
 const express = require('express');
 const account = require("mysql2").createPool({
     host: process.env.MYSQL_HOST,
@@ -60,6 +61,16 @@ const luckperms = require("mysql2").createPool({
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE_LUCKPERMS,
+    charset: "utf8mb4",
+    insecureAuth: true
+});
+
+const ban = require("mysql2").createPool({
+    host: process.env.MYSQL_HOST,
+    port: process.env.MYSQL_PORT,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE_BANS,
     charset: "utf8mb4",
     insecureAuth: true
 });
@@ -123,8 +134,10 @@ router.get("/", (req, res) => {
                 if(!userGroup[0][0]) return luckperms.promise().query("INSERT INTO luckperms_players (uuid, username, primary_group) VALUES (?, ?, ?)", [user[0][0].uuid, user[0][0].login, "default"])
                     .then(() => res.redirect("/panel/event?type=SuccessRegistration"))
                     .catch(console.error);
-
-                return res.render("panel/index", { account: user[0][0], userGroup: userGroup, userGroups: userGroups, userLogin: req.cookies.userLogin || "Личный кабинет" });
+                    ban.query("SELECT * FROM punishments WHERE username = ? AND type = 'BAN' OR type = 'TEMPBAN' LIMIT 1", [user[0][0].login], (err, bans) => {
+                        if(err) throw err;
+                        return res.render("panel/index", { account: user[0][0], moment: moment, bans: bans, userGroup: userGroup, userGroups: userGroups, userLogin: req.cookies.userLogin || "Личный кабинет" });
+                    });
             }
         }).catch(console.error);
 });

@@ -10,14 +10,18 @@
         <br><div class="table table-responsive">
             <div class="table-header">
                 <div class="table-row">
+                    <div style="color: white;" class="table-cell-resp">ID</div>
+                    <div style="color: white;" class="table-cell">ID</div>
+                    <div style="color: white;" class="table-cell-resp">Тип</div>
+                    <div style="color: white;" class="table-cell">Тип</div>
                     <div style="color: white;" class="table-cell-resp">Никнейм нарушителя</div>
                     <div style="color: white;" class="table-cell">Никнейм нарушителя</div>
                     <div style="color: white;" class="table-cell-resp">Никнейм модератора</div>
                     <div style="color: white;" class="table-cell">Никнейм модератора</div>
-                    <div style="color: white;" class="table-cell-resp">Комментарий модератора</div>
-                    <div style="color: white;" class="table-cell">Комментарий модератора</div>
-                    <div style="color: white;" class="table-cell-resp">Сервер получения</div>
-                    <div style="color: white;" class="table-cell">Сервер получения</div>
+                    <div style="color: white;" class="table-cell-resp">Пункт правил</div>
+                    <div style="color: white;" class="table-cell">Пункт правил</div>
+                    <div style="color: white;" class="table-cell-resp">Комментарий</div>
+                    <div style="color: white;" class="table-cell">Комментарий</div>
                     <div style="color: white;" class="table-cell-resp">Начало наказания</div>
                     <div style="color: white;" class="table-cell">Начало наказания</div>
                     <div style="color: white;" class="table-cell-resp">Конец наказания</div>
@@ -30,30 +34,43 @@
                   <% if (user.time == 0) { %>
                     <% var perm = "никогда"; %>
                     <% } else { %>
-                      <% var enddate = moment(new Date(Number(user.until))).utcOffset(3).locale('ru').format('lll'); %>
+                      <% var enddate = moment(new Date(Number(user.time))).utcOffset(3).locale('ru').format('lll'); %>
                       <% } %>
                       <% if (user.type == "BAN") { %>
-                        <% var ban = "бан"; %>
+                        <% var type = "бан"; %>
                         <% }%>
-                          <% if (user.server_origin == null) { %>
+                        <% if (user.type == "TEMPBAN") { %>
+                          <% var type = "вр. бан"; %>
+                          <% }%>
+                          <% if (user.type == "MUTE") { %>
+                            <% var type = "мут"; %>
+                            <% }%>
+                            <% if (user.type == "TEMPMUTE") { %>
+                              <% var type = "вр. мут"; %>
+                              <% }%>
+                          <% if (user.reason == null) { %>
                             <% var srvundef = "неизвестно"; %>
                             <% }%>
-                              <% if (user.banned_by_name == "Console") { %>
+                              <% if (user.admin == "CONSOLE") { %>
                                 <% var srvconsole = "консоль"; %>
                                   <% }%>
                     <div class="table-row">
+                        <div style="background-color: black; color: white;" class="table-cell-resp">ID</div>
+                        <div style="background-color: black; color: white;" class="table-cell"><%- user.id || "N/D" %></div>
+                        <div style="background-color: black; color: white;" class="table-cell-resp">Тип</div>
+                        <div style="background-color: black; color: white;" class="table-cell"><%- type || "неизвестно" %></div>
                         <div style="background-color: black; color: white;" class="table-cell-resp">Никнейм нарушителя</div>
-                        <div style="background-color: black; color: white;" class="table-cell"><%- history.find(h => h.uuid == user.uuid).name || "Неизвестно" %></div>
+                        <div style="background-color: black; color: white;" class="table-cell"><%- user.username || "неизвестно" %></div>
                         <div style="background-color: black; color: white;" class="table-cell-resp">Никнейм модератора</div>
-                        <div style="background-color: black; color: white;" class="table-cell"><%- srvconsole || user.banned_by_name %></div>
-                        <div style="background-color: black; color: white;" class="table-cell-resp">Комментарий модератора</div>
-                        <div style="background-color: black; color: white;" class="table-cell"><%- user.reason %></div>
-                        <div style="background-color: black; color: white;" class="table-cell-resp">Сервер получения</div>
-                        <div style="background-color: black; color: white;" class="table-cell"><%- srvundef || user.server_origin %></div>
+                        <div style="background-color: black; color: white;" class="table-cell"><%- srvconsole || user.admin || "неизвестно" %></div>
+                        <div style="background-color: black; color: white;" class="table-cell-resp">Пункт правил</div>
+                        <div style="background-color: black; color: white;" class="table-cell"><%- user.reason || "неизвестно" %></div>
+                        <div style="background-color: black; color: white;" class="table-cell-resp">Комментарий</div>
+                        <div style="background-color: black; color: white;" class="table-cell"><%- user.comment || "неизвестно" %></div>
                         <div style="background-color: black; color: white;" class="table-cell-resp">Начало наказания</div>
-                        <div style="background-color: black; color: white;" class="table-cell"><%- moment(new Date(Number(user.time))).utcOffset(3).locale('ru').format('lll') %></div>
+                        <div style="background-color: black; color: white;" class="table-cell"><%- moment(new Date(Number(user.expire))).utcOffset(3).locale('ru').format('lll') || "неизвестно" %></div>
                         <div style="background-color: black; color: white;" class="table-cell-resp">Конец наказания</div>
-                        <div style="background-color: black; color: white;" class="table-cell"><%- perm || enddate %></div>
+                        <div style="background-color: black; color: white;" class="table-cell"><%- perm || enddate || "неизвестно" %></div>
                     </div>
                 <% }); %>
             </div>

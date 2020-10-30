@@ -78,9 +78,9 @@ app.get("/site-api/instanceStatus", (req, res) => {
 
 app.get("/discord", (req, res) => res.redirect(`https://discord.gg/dZ5bFGh`));
 app.get("/bans", (req, res) => {
-    ban.query("SELECT * from litebans_bans", (err, bans) => {
+    ban.query("SELECT * from punishments", (err, bans) => {
         if(err) throw err;
-        ban.query("SELECT * FROM litebans_history", (err, history) => {
+        ban.query("SELECT * FROM punishments", (err, history) => {
             if(err) throw err;
             return res.render("bans", { moment: moment, bans: bans, history: history, userLogin: req.cookies.userLogin || "Личный кабинет" });
         });
