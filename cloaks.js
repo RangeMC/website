@@ -14,7 +14,7 @@ router.get("/", (req, res) => {
     res.sendFile(__dirname + "/cloaks/default.png");
 });
 
-router.get("/:nickname", (req, res) => {
+router.get("/:nickname.png", (req, res) => {
     let pathToDefaultPlayerSkin = __dirname + `/cloaks/default.png`;
     account.query("SELECT * FROM cloaks WHERE login = ?", [req.params.nickname], (err, skin) => {
         if(err) return console.error(err);

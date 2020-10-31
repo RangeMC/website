@@ -14,7 +14,7 @@ router.get("/", (req, res) => { // надо сделать отображени�
     res.sendFile(__dirname + "/skins/default.png");
 });
 
-router.get("/:nickname", (req, res) => {
+router.get("/:nickname.png", (req, res) => {
     let pathToDefaultPlayerSkin = __dirname + `/skins/default.png`;
     account.query("SELECT * FROM skins WHERE login = ?", [req.params.nickname], (err, skin) => {
         if(err) return console.error(err);
