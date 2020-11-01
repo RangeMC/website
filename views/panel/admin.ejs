@@ -43,7 +43,7 @@
                             <div style="background-color: black; color: white;" class="table-cell-resp">Ключ сессии</div>
                             <div style="background-color: black; color: white;" class="table-cell"><%- (user.lk_cookie == null) ? "Не авторизован" : (user.access == 4) ? "<b>скрыт</b>" : user.lk_cookie %></div>
                             <div style="background-color: black; color: white;" class="table-cell-resp">Ранг аккаунта</div>
-                            <div style="background-color: black; color: white;" class="table-cell"><%- (user.access == 0) ? "Игрок" : (user.access == 1) ? "Хелпер" : (user.access == 2) ? "Модератор" : (user.access == 3) ? "Администратор" : (user.access == 4) ? "Разработчик" : "Неизвестно" %></div>
+                            <div style="background-color: black; color: white;" class="table-cell"><%- userGroups[userGroup[0][0].primary_group] %></div>
                             <div style="background-color: black; color: white;" class="table-cell-resp">Блокировка входа</div>
                             <div style="background-color: black; color: white;" class="table-cell"><%- (user.blocked == 1) ? "Да" : "Нет" %></div>
                             <div style="background-color: black; color: white;" class="table-cell-resp">Кем был приглашён?</div>

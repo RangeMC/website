@@ -1,3 +1,4 @@
+const index = require('./index');
 const express = require('express');
 const router = express.Router();
 const fs = require("fs");
@@ -8,7 +9,7 @@ router.get("/", (req, res) => { // надо сделать отображени�
 
 router.get("/:nickname.png", (req, res) => {
     let pathToDefaultPlayerSkin = __dirname + `/skins/default.png`;
-    mysql.query("SELECT * FROM skins WHERE login = ?", [req.params.nickname], (err, skin) => {
+    index.mysql.query("SELECT * FROM skins WHERE login = ?", [req.params.nickname], (err, skin) => {
         if(err) return console.error(err);
         if(!skin[0]) return res.sendFile(pathToDefaultPlayerSkin);
         else {

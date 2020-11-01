@@ -1,3 +1,4 @@
+const index = require('./index');
 const path = require("path");
 const uuid = require("uuid");
 
@@ -52,7 +53,7 @@ const userGroups = {
     moder: "Модератор",
     stmoder: "Старший модератор",
     devel: "Разработчик",
-    admin: "Босс"
+    admin: "Админ"
 };
 
 const errors = {
@@ -94,18 +95,18 @@ router.use(express.urlencoded({ extended: true }));
 
 router.get("/", (req, res) => {
     if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then(async (user) => {
             if(!user[0][0]) {
                 res.cookie("loginHash", null, { maxAge: -1 });
                 res.cookie("userLogin", null, { maxAge: -1 });
                 return res.redirect("/panel/login");
             } else {
-                let userGroup = await mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
-                if(!userGroup[0][0]) return mysql.promise().query("INSERT INTO luckperms_players (uuid, username, primary_group) VALUES (?, ?, ?)", [user[0][0].uuid, user[0][0].login, "default"])
+                let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
+                if(!userGroup[0][0]) return index.mysql.promise().query("INSERT INTO luckperms_players (uuid, username, primary_group) VALUES (?, ?, ?)", [user[0][0].uuid, user[0][0].login, "default"])
                     .then(() => res.redirect("/panel/event?type=SuccessRegistration"))
                     .catch(console.error);
-                    mysql.query("SELECT * FROM punishments WHERE username = ? AND type = 'BAN' OR type = 'TEMPBAN' LIMIT 1", [user[0][0].login], (err, bans) => {
+                    index.mysql.query("SELECT * FROM punishments WHERE username = ? AND type = 'BAN' OR type = 'TEMPBAN' LIMIT 1", [user[0][0].login], (err, bans) => {
                         if(err) throw err;
                         return res.render("panel/index", { account: user[0][0], moment: moment, bans: bans, userGroup: userGroup, userGroups: userGroups, userLogin: req.cookies.userLogin || "Личный кабинет" });
                     });
@@ -115,7 +116,7 @@ router.get("/", (req, res) => {
 
 router.get("/cloak", (req, res) => {
     if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then((user) => {
             if(!user[0][0]) {
                 res.cookie("loginHash", null, { maxAge: -1 });
@@ -134,16 +135,16 @@ router.get("/download", (req, res) => {
 
 router.get("/admin", (req, res) => {
     if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then(async (user) => {
             if(!user[0][0]) {
                 res.cookie("loginHash", null, { maxAge: -1 });
                 res.cookie("userLogin", null, { maxAge: -1 });
                 return res.redirect("/panel/login");
             } else {
-                let userGroup = await mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
+                let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
                 if(!["admin"].includes(userGroup[0][0].primary_group)) return res.redirect("/panel/event?type=AccessDenied");
-                else return mysql.promise().query("SELECT * FROM accounts")
+                else return index.mysql.promise().query("SELECT * FROM accounts")
                     .then((accounts) => res.render("panel/admin", { accounts: accounts[0], userLogin: req.cookies.userLogin || "Личный кабинет" })).catch(console.error);
             }
         }).catch(console.error);
@@ -151,16 +152,16 @@ router.get("/admin", (req, res) => {
 
 router.get("/newUser", (req, res) => {
     if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then(async (user) => {
             if(!user[0][0]) {
                 res.cookie("loginHash", null, { maxAge: -1 });
                 res.cookie("userLogin", null, { maxAge: -1 });
                 return res.redirect("/panel/login");
             } else {
-                let userGroup = await mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
+                let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
                 if(!["admin"].includes(userGroup[0][0].primary_group)) return res.redirect("/panel/event?type=AccessDenied");
-                else return mysql.promise().query("SELECT * FROM accounts")
+                else return index.mysql.promise().query("SELECT * FROM accounts")
                     .then((accounts) => res.render("panel/newUser", { accounts: accounts[0], userLogin: req.cookies.userLogin || "Личный кабинет" })).catch(console.error);
             }
         }).catch(console.error);
@@ -168,20 +169,20 @@ router.get("/newUser", (req, res) => {
 
 router.get("/list", (req, res) => {
     if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then((user) => {
             if(!user[0][0]) {
                 res.cookie("loginHash", null, { maxAge: -1 });
                 res.cookie("userLogin", null, { maxAge: -1 });
                 return res.redirect("/panel/login");
-            } else return mysql.promise().query("SELECT * FROM accounts")
+            } else return index.mysql.promise().query("SELECT * FROM accounts")
                 .then((accounts) => res.render("panel/list", { accounts: accounts[0], userLogin: req.cookies.userLogin || "Личный кабинет" })).catch(console.error);
         }).catch(console.error);
 });
 
 router.get("/apply/:nickname", (req, res) => {
     if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then((user) => {
             if(!user[0][0]) {
                 res.cookie("loginHash", null, { maxAge: -1 });
@@ -190,21 +191,21 @@ router.get("/apply/:nickname", (req, res) => {
             } else {
                 if(!['skin', 'cloak'].includes(req.query.type)) return res.redirect("/panel/list");
                 if(req.query.accept == "true")
-                    return mysql.promise().query(`SELECT * FROM ${(req.query.type == "skin") ? "skins" : (req.query.type == "cloak") ? "cloaks" : "undefined"} WHERE login = ?`, [req.params.nickname])
+                    return index.mysql.promise().query(`SELECT * FROM ${(req.query.type == "skin") ? "skins" : (req.query.type == "cloak") ? "cloaks" : "undefined"} WHERE login = ?`, [req.params.nickname])
                         .then((item) => {
                             if(!item[0][0]) return res.redirect("/panel/list");
-                            else return mysql.promise().query(`UPDATE ${(req.query.type == "skin") ? "skins" : (req.query.type == "cloak") ? "cloaks" : "undefined"} SET hash = ? WHERE login = ?`, [item[0][0].hash, user[0][0].login])
+                            else return index.mysql.promise().query(`UPDATE ${(req.query.type == "skin") ? "skins" : (req.query.type == "cloak") ? "cloaks" : "undefined"} SET hash = ? WHERE login = ?`, [item[0][0].hash, user[0][0].login])
                                 .then(() => {
                                     // rcon.send(`kick ${user[0][0].login} @${(req.query.type == "skin") ? "Skin" : (req.query.type == "cloak") ? "Cloak" : "undefined"}Changed`);
                                     res.redirect(`/panel/event?type=Success${(req.query.type == "skin") ? "Skin" : (req.query.type == "cloak") ? "Cloak" : "undefined"}Change`);
-                                }).catch(() => mysql.promise().query(`INSERT INTO ${(req.query.type == "skin") ? "skins" : (req.query.type == "cloak") ? "cloaks" : "undefined"} (hash, login) VALUES (?, ?)`, [item[0][0].hash, user[0][0].login])
+                                }).catch(() => index.mysql.promise().query(`INSERT INTO ${(req.query.type == "skin") ? "skins" : (req.query.type == "cloak") ? "cloaks" : "undefined"} (hash, login) VALUES (?, ?)`, [item[0][0].hash, user[0][0].login])
                                     .then(() => {
                                         // rcon.send(`kick ${user[0][0].login} @${(req.query.type == "skin") ? "Skin" : (req.query.type == "cloak") ? "Cloak" : "undefined"}Changed`);
                                         res.redirect(`/panel/event?type=Success${(req.query.type == "skin") ? "Skin" : (req.query.type == "cloak") ? "Cloak" : "undefined"}Change`);
                                     }).catch(console.error)
                                 );
                         }).catch(console.error);
-                else return mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.params.nickname])
+                else return index.mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.params.nickname])
                     .then((accounts) => {
                         if(!accounts[0][0]) return res.redirect("/panel/list");
                         else return res.render("panel/apply", { account: accounts[0], type: req.query.type, userLogin: req.cookies.userLogin || "Личный кабинет" });
@@ -215,14 +216,14 @@ router.get("/apply/:nickname", (req, res) => {
 
 router.get("/console", (req, res) => {
     if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then(async (user) => {
             if(!user[0][0]) {
                 res.cookie("loginHash", null, { maxAge: -1 });
                 res.cookie("userLogin", null, { maxAge: -1 });
                 return res.redirect("/panel/login");
             } else {
-                let userGroup = await mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
+                let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
                 if(!["admin"].includes(userGroup[0][0].primary_group)) return res.redirect("https://yadi.sk/i/HIJpMdEMgUqxcA");
                 else return res.render("panel/console", { account: user[0][0], userLogin: req.cookies.userLogin || "Личный кабинет" });
             }
@@ -231,16 +232,16 @@ router.get("/console", (req, res) => {
 
 router.get("/admin/:login", (req, res) => {
     if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then(async (user) => {
             if(!user[0][0]) {
                 res.cookie("loginHash", null, { maxAge: -1 });
                 res.cookie("userLogin", null, { maxAge: -1 });
                 return res.redirect("/panel/login");
             } else {
-                let userGroup = await mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
+                let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
                 if(!["admin"].includes(userGroup[0][0].primary_group)) return res.redirect("/panel/event?type=AccessDenied");
-                else return mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.params.login])
+                else return index.mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.params.login])
                     .then((accounts) => {
                         if(accounts[0][0].access < 4) return res.render("panel/userEdit", { account: accounts[0][0], userLogin: req.cookies.userLogin || "Личный кабинет" });
                         else return res.redirect("/panel/event?type=AccessDenied");
@@ -250,10 +251,10 @@ router.get("/admin/:login", (req, res) => {
 });
 
 router.get("/sendCommand", (req, res) => {
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then(async (user) => {
             if(!user[0][0]) return res.redirect("/");
-            let userGroup = await mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
+            let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
             if(!["admin"].includes(userGroup[0][0].primary_group)) return res.redirect("/panel/event?type=AccessDenied");
             else return rcon.send(req.query.command)
                 .then((r) => res.json({ command: req.query.command, log: r.replace(/§./g, "") || "Сервер вернул пустой ответ." }));
@@ -261,31 +262,31 @@ router.get("/sendCommand", (req, res) => {
 });
 
 router.post("/addUser", (req, res) => {
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then(async (user) => {
             if(!user[0][0]) return res.redirect("/");
-            let userGroup = await mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
+            let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
             if(!["admin"].includes(userGroup[0][0].primary_group)) return res.redirect("/panel/event?type=AccessDenied");
-            else return mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.body.login])
+            else return index.mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.body.login])
                 .then((accounts) => {
                     if(accounts[0][0]) return res.redirect("/panel/admin");
-                    else return mysql.promise().query("INSERT INTO accounts (login, pass) VALUES (?, ?)", [req.body.login, req.body.pass])
+                    else return index.mysql.promise().query("INSERT INTO accounts (login, pass) VALUES (?, ?)", [req.body.login, req.body.pass])
                         .then(() => res.redirect("/panel/admin?type=SuccessAddUser")).catch(console.error);
                 }).catch(console.error);
         }).catch(console.error);
 });
 
 router.post("/editUser", (req, res) => {
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then(async (user) => {
             if(!user[0][0]) return res.redirect("/");
-            let userGroup = await mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
+            let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
             if(!["admin"].includes(userGroup[0][0].primary_group)) return res.redirect("/panel/event?type=AccessDenied");
-            else return mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.body.login])
+            else return index.mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.body.login])
                 .then((accounts) => {
                     if(!accounts[0][0]) return res.redirect("/panel/admin");
                     if(accounts[0][0].access < 4)
-                        return mysql.promise().query("UPDATE accounts SET login = ?, pass = ?, access = ?, blocked = ?, invited_by = ?, vk = ? WHERE login = ?", [req.body.login, req.body.pass, req.body.access, req.body.blocked, ((req.body.invited_by.length <= 3) ? null : req.body.invited_by), req.body.vk, req.body.login])
+                        return index.mysql.promise().query("UPDATE accounts SET login = ?, pass = ?, access = ?, blocked = ?, invited_by = ?, vk = ? WHERE login = ?", [req.body.login, req.body.pass, req.body.access, req.body.blocked, ((req.body.invited_by.length <= 3) ? null : req.body.invited_by), req.body.vk, req.body.login])
                             .then(() => {
                                 // rcon.send(`kick ${accounts[0][0].login} @AccountEdited`);
                                 return res.redirect("/panel/admin?type=SuccessEditUser");
@@ -297,17 +298,17 @@ router.post("/editUser", (req, res) => {
 });
 
 router.get("/deleteUser", (req, res) => {
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then(async (user) => {
             if(!user[0][0]) return res.redirect("/");
-            let userGroup = await mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
+            let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
             if(!["admin"].includes(userGroup[0][0].primary_group)) return res.redirect("/panel/event?type=AccessDenied");
-            else return mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.query.login])
+            else return index.mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.query.login])
                 .then((accounts) => {
                     if(!accounts[0][0]) return res.redirect("/panel/admin");
                     else {
                         if(accounts[0][0].access < 4)
-                            return mysql.promise().query("DELETE FROM accounts WHERE login = ?", [req.query.login])
+                            return index.mysql.promise().query("DELETE FROM accounts WHERE login = ?", [req.query.login])
                                 .then(() => res.redirect("/panel/admin?type=SuccessDeleteUser")).catch(console.error);
                         else
                             return res.redirect("/panel/event?type=AccessDenied");
@@ -318,7 +319,7 @@ router.get("/deleteUser", (req, res) => {
 
 router.get("/data", (req, res) => {
     if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then((user) => {
             if(!user[0][0]) {
                 res.cookie("loginHash", null, { maxAge: -1 });
@@ -334,7 +335,7 @@ router.get("/event", (req, res) => {
 
 router.get("/skin", (req, res) => {
     if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then((user) => {
             if(!user[0][0]) {
                 res.cookie("loginHash", null, { maxAge: -1 });
@@ -349,7 +350,7 @@ router.get("/skin", (req, res) => {
 
 router.get("/viewSkin", (req, res) => {
     if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then((user) => {
             if(!user[0][0]) {
                 res.cookie("loginHash", null, { maxAge: -1 });
@@ -363,7 +364,7 @@ router.get("/viewSkin", (req, res) => {
 });
 
 router.post("/skin", (req, res, next) => {
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then((user) => {
             if(!user[0][0]) return res.redirect("/");
             else {
@@ -376,14 +377,14 @@ router.post("/skin", (req, res, next) => {
                             console.error(err); // not multer
                             res.status(500).render("error", { error: 500, errorProcessed: "Неизвестная ошибка. Обратитесь в нашу группу ВКонтакте.", userLogin: req.cookies.userLogin || "Личный кабинет" });
                         }
-                    } else return mysql.promise().query("SELECT * FROM skins WHERE login = ?", [user[0][0].login])
+                    } else return index.mysql.promise().query("SELECT * FROM skins WHERE login = ?", [user[0][0].login])
                         .then((skin) => {
-                            if(!skin[0][0]) return mysql.promise().query("INSERT INTO skins (hash, login) VALUES (?, ?)", [req.file.filename, user[0][0].login])
+                            if(!skin[0][0]) return index.mysql.promise().query("INSERT INTO skins (hash, login) VALUES (?, ?)", [req.file.filename, user[0][0].login])
                                 .then(() => {
                                     // rcon.send(`kick ${user[0][0].login} @SkinChanged`);
                                     return res.redirect("/panel/event?type=SuccessSkinChange");
                                 }).catch(console.error);
-                            else return mysql.promise().query("UPDATE skins SET hash = ? WHERE login = ?", [req.file.filename, user[0][0].login])
+                            else return index.mysql.promise().query("UPDATE skins SET hash = ? WHERE login = ?", [req.file.filename, user[0][0].login])
                                 .then(() => {
                                     // rcon.send(`kick ${user[0][0].login} @SkinChanged`);
                                     res.redirect("/panel/event?type=SuccessSkinChange");
@@ -396,7 +397,7 @@ router.post("/skin", (req, res, next) => {
 
 
 router.post("/cloak", (req, res, next) => {
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then((user) => {
             if(!user[0][0]) return res.redirect("/");
             else {
@@ -409,14 +410,14 @@ router.post("/cloak", (req, res, next) => {
                             console.error(err); // not multer
                             res.status(500).render("error", { error: 500, errorProcessed: "Неизвестная ошибка. Обратитесь в нашу группу ВКонтакте.", userLogin: req.cookies.userLogin || "Личный кабинет" });
                         }
-                    } else return mysql.promise().query("SELECT * FROM cloaks WHERE login = ?", [user[0][0].login])
+                    } else return index.mysql.promise().query("SELECT * FROM cloaks WHERE login = ?", [user[0][0].login])
                         .then((skin) => {
-                            if(!skin[0][0]) return mysql.promise().query("INSERT INTO cloaks (hash, login) VALUES (?, ?)", [req.file.filename, user[0][0].login])
+                            if(!skin[0][0]) return index.mysql.promise().query("INSERT INTO cloaks (hash, login) VALUES (?, ?)", [req.file.filename, user[0][0].login])
                                 .then(() => {
                                     // rcon.send(`kick ${user[0][0].login} @CloakChanged`);
                                     res.redirect("/panel/event?type=SuccessCloakChange");
                                 }).catch(console.error);
-                            else return mysql.promise().query("UPDATE cloaks SET hash = ? WHERE login = ?", [req.file.filename, user[0][0].login])
+                            else return index.mysql.promise().query("UPDATE cloaks SET hash = ? WHERE login = ?", [req.file.filename, user[0][0].login])
                                 .then(() => {
                                     // rcon.send(`kick ${user[0][0].login} @CloakChanged`);
                                     res.redirect("/panel/event?type=SuccessCloakChange");
@@ -429,7 +430,7 @@ router.post("/cloak", (req, res, next) => {
 
 router.get("/viewCloak", (req, res) => {
     if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then((user) => {
             if(!user[0][0]) {
                 res.cookie("loginHash", null, { maxAge: -1 });
@@ -444,7 +445,7 @@ router.get("/viewCloak", (req, res) => {
 
 router.get("/password", (req, res) => {
     if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then((user) => {
             if(!user[0][0]) {
                 res.cookie("loginHash", null, { maxAge: -1 });
@@ -458,13 +459,13 @@ router.get("/password", (req, res) => {
 });
 
 router.post("/password", (req, res) => {
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then((user) => {
             if(!user[0][0]) return res.redirect("/");
             else {
                 if(user[0][0].pass !== req.body.passold) return res.redirect("/panel/password?error=IncorrectPassword");
                 else {
-                    mysql.promise().query("UPDATE accounts SET pass = ? WHERE login = ?", [req.body.passnew, user[0][0].login]);
+                    index.mysql.promise().query("UPDATE accounts SET pass = ? WHERE login = ?", [req.body.passnew, user[0][0].login]);
                     // rcon.send(`kick ${user[0][0].login} @PasswordChanged`);
                     return res.redirect("/panel/event?type=SuccessPasswordChange");
                 }
@@ -489,7 +490,7 @@ router.get("/video/:type", (req, res) => {
 });
 
 router.post("/login", (req, res) => {
-    mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.body.login])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.body.login])
         .then((user) => {
             if(!user[0][0]) return res.redirect("/panel/login?error=NotFound");
             else {
@@ -507,7 +508,7 @@ router.post("/login", (req, res) => {
                         let hash = uuid.v4();
                         res.cookie("loginHash", hash, { maxAge: (86400 * 1000) });
                         res.cookie("userLogin", user[0][0].login, { maxAge: (86400 * 1000) });
-                        mysql.promise().query("UPDATE accounts SET lk_cookie = ? WHERE login = ?", [hash, user[0][0].login]);
+                        index.mysql.promise().query("UPDATE accounts SET lk_cookie = ? WHERE login = ?", [hash, user[0][0].login]);
                         return res.redirect("/panel");
                     }
                 }
@@ -525,14 +526,14 @@ router.get("/register", (req, res) => {
 
 router.post("/register", recaptcha.middleware.verify, (req, res) => {
     console.log(req.body);
-    mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.body.login])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.body.login])
         .then((user) => {
             if(user[0][0]) return res.redirect("/panel/register?error=Found");
             if(!req.recaptcha.error) {
                 let hash = uuid.v4();
                 res.cookie("loginHash", hash, { maxAge: (86400 * 1000) });
                 res.cookie("userLogin", req.body.login, { maxAge: (86400 * 1000) });
-                mysql.promise().query("INSERT INTO accounts (login, pass, lk_cookie) VALUES (?, ?, ?)", [req.body.login, req.body.pass, hash]);
+                index.mysql.promise().query("INSERT INTO accounts (login, pass, lk_cookie) VALUES (?, ?, ?)", [req.body.login, req.body.pass, hash]);
                 return res.redirect("/panel");
             } else return res.redirect("/panel/register?error=RecaptchaError");
         }).catch(console.error);
@@ -540,10 +541,10 @@ router.post("/register", recaptcha.middleware.verify, (req, res) => {
 
 router.get("/logout", (req, res) => {
     if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
+    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then((user) => {
             if(!user[0][0]) return res.redirect("/panel/login");
-            mysql.promise().query("UPDATE accounts SET lk_cookie = ? WHERE lk_cookie = ?", [null, req.cookies.loginHash])
+            index.mysql.promise().query("UPDATE accounts SET lk_cookie = ? WHERE lk_cookie = ?", [null, req.cookies.loginHash])
                 .catch(console.error);
 
             res.cookie("loginHash", null, { maxAge: -1 });

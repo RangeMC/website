@@ -8,7 +8,7 @@ instance.login(process.env.PANEL_CLIENT, process.env.PANEL_CLIENT_KEY, (logged_i
     else accessToStatusAPI = false;
 });
 
-var mysql = require("mysql2").createPool({
+const mysql = require("mysql2").createPool({
     host: process.env.MYSQL_HOST,
     port: process.env.MYSQL_PORT,
     user: process.env.MYSQL_USER,
@@ -16,6 +16,8 @@ var mysql = require("mysql2").createPool({
     database: process.env.MYSQL_DATABASE,
     connectTimeout: 604800000
 });
+
+exports.mysql = mysql;
 
 const moment = require("moment");
 const express = require("express");
