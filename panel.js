@@ -1,6 +1,7 @@
 const index = require('./index');
 const path = require("path");
 const uuid = require("uuid");
+const md5 = require("md5");
 
 const Google = require("express-recaptcha").RecaptchaV3;
 const recaptcha = new Google('6Ld7KNgZAAAAACD5dy4xH0PthgsLSL1ZH0eXf03K', '6Ld7KNgZAAAAAE1gPNIeuPt-7LsAb32ZDq5RRqA6', { hl: 'ru', callback: 'insertToForm' });
@@ -270,7 +271,7 @@ router.post("/addUser", (req, res) => {
             else return index.mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.body.login])
                 .then((accounts) => {
                     if(accounts[0][0]) return res.redirect("/panel/admin");
-                    else return index.mysql.promise().query("INSERT INTO accounts (login, pass) VALUES (?, ?)", [req.body.login, req.body.pass])
+                    else return index.mysql.promise().query("INSERT INTO accounts (login, pass) VALUES (?, MD5(?))", [req.body.login, req.body.pass])
                         .then(() => res.redirect("/panel/admin?type=SuccessAddUser")).catch(console.error);
                 }).catch(console.error);
         }).catch(console.error);
@@ -286,7 +287,7 @@ router.post("/editUser", (req, res) => {
                 .then((accounts) => {
                     if(!accounts[0][0]) return res.redirect("/panel/admin");
                     if(accounts[0][0].access < 4)
-                        return index.mysql.promise().query("UPDATE accounts SET login = ?, pass = ?, access = ?, blocked = ?, invited_by = ?, vk = ? WHERE login = ?", [req.body.login, req.body.pass, req.body.access, req.body.blocked, ((req.body.invited_by.length <= 3) ? null : req.body.invited_by), req.body.vk, req.body.login])
+                        return index.mysql.promise().query("UPDATE accounts SET login = ?, pass = MD5(?), access = ?, blocked = ?, invited_by = ?, vk = ? WHERE login = ?", [req.body.login, req.body.pass, req.body.access, req.body.blocked, ((req.body.invited_by.length <= 3) ? null : req.body.invited_by), req.body.vk, req.body.login])
                             .then(() => {
                                 // rcon.send(`kick ${accounts[0][0].login} @AccountEdited`);
                                 return res.redirect("/panel/admin?type=SuccessEditUser");
@@ -463,9 +464,9 @@ router.post("/password", (req, res) => {
         .then((user) => {
             if(!user[0][0]) return res.redirect("/");
             else {
-                if(user[0][0].pass !== req.body.passold) return res.redirect("/panel/password?error=IncorrectPassword");
+                if(user[0][0].pass !== md5(req.body.passold)) return res.redirect("/panel/password?error=IncorrectPassword");
                 else {
-                    index.mysql.promise().query("UPDATE accounts SET pass = ? WHERE login = ?", [req.body.passnew, user[0][0].login]);
+                    index.mysql.promise().query("UPDATE accounts SET pass = MD5(?) WHERE login = ?", [req.body.passnew, user[0][0].login]);
                     // rcon.send(`kick ${user[0][0].login} @PasswordChanged`);
                     return res.redirect("/panel/event?type=SuccessPasswordChange");
                 }
@@ -494,7 +495,7 @@ router.post("/login", (req, res) => {
         .then((user) => {
             if(!user[0][0]) return res.redirect("/panel/login?error=NotFound");
             else {
-                if(user[0][0].pass !== req.body.pass) return res.redirect("/panel/login?error=IncorrectPassword");
+                if(user[0][0].pass !== md5(req.body.pass)) return res.redirect("/panel/login?error=IncorrectPassword");
                 else {
                     if(user[0][0].blocked == 1) { // return res.redirect("/panel/login?error=Deactivated");
                         function randomInteger(min, max) {
@@ -533,7 +534,7 @@ router.post("/register", recaptcha.middleware.verify, (req, res) => {
                 let hash = uuid.v4();
                 res.cookie("loginHash", hash, { maxAge: (86400 * 1000) });
                 res.cookie("userLogin", req.body.login, { maxAge: (86400 * 1000) });
-                index.mysql.promise().query("INSERT INTO accounts (login, pass, lk_cookie) VALUES (?, ?, ?)", [req.body.login, req.body.pass, hash]);
+                index.mysql.promise().query("INSERT INTO accounts (login, pass, lk_cookie) VALUES (?, MD5(?), ?)", [req.body.login, req.body.pass, hash]);
                 return res.redirect("/panel");
             } else return res.redirect("/panel/register?error=RecaptchaError");
         }).catch(console.error);
