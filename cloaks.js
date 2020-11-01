@@ -1,14 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const fs = require("fs");
-const account = require("mysql2").createPool({
-    host: process.env.MYSQL_HOST,
-    port: process.env.MYSQL_PORT,
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE_ACCOUNTS,
-    connectTimeout: 604800000
-});
 
 router.get("/", (req, res) => {
     res.sendFile(__dirname + "/cloaks/default.png");
@@ -16,7 +8,7 @@ router.get("/", (req, res) => {
 
 router.get("/:nickname.png", (req, res) => {
     let pathToDefaultPlayerSkin = __dirname + `/cloaks/default.png`;
-    account.query("SELECT * FROM cloaks WHERE login = ?", [req.params.nickname], (err, skin) => {
+    mysql.query("SELECT * FROM cloaks WHERE login = ?", [req.params.nickname], (err, skin) => {
         if(err) return console.error(err);
         if(!skin[0]) return res.sendFile(pathToDefaultPlayerSkin);
         else {

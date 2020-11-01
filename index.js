@@ -8,17 +8,16 @@ instance.login(process.env.PANEL_CLIENT, process.env.PANEL_CLIENT_KEY, (logged_i
     else accessToStatusAPI = false;
 });
 
-const moment = require("moment");
-const ban = require("mysql2").createPool({
+var mysql = require("mysql2").createPool({
     host: process.env.MYSQL_HOST,
     port: process.env.MYSQL_PORT,
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE_BANS,
-    charset: "utf8mb4",
-    insecureAuth: true
+    database: process.env.MYSQL_DATABASE,
+    connectTimeout: 604800000
 });
 
+const moment = require("moment");
 const express = require("express");
 const app = express();
 const cors = require('cors');
@@ -78,9 +77,9 @@ app.get("/site-api/instanceStatus", (req, res) => {
 
 app.get("/discord", (req, res) => res.redirect(`https://discord.gg/dZ5bFGh`));
 app.get("/bans", (req, res) => {
-    ban.query("SELECT * from punishments", (err, bans) => {
+    mysql.query("SELECT * from punishments", (err, bans) => {
         if(err) throw err;
-        ban.query("SELECT * FROM punishments", (err, history) => {
+        mysql.query("SELECT * FROM punishments", (err, history) => {
             if(err) throw err;
             return res.render("bans", { moment: moment, bans: bans, history: history, userLogin: req.cookies.userLogin || "Личный кабинет" });
         });
