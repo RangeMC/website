@@ -1,0 +1,109 @@
+@import "root.css";
+html,
+body {
+    font-family: 'Tahoma';
+    margin: 0;
+    padding: 0;
+    background-color: var(--mainbgcolor) !important;
+}
+
+.footer {
+    background-color: #121212;
+    color: white;
+    margin: 0 auto;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.images {
+    /* padding: 50px; */
+    margin-right: 30px;
+}
+
+@media screen and (max-width: 768px) {
+    .images {
+        margin-top: 50px;
+        margin-bottom: 80px;
+    }
+}
+
+
+/* ButtonScroll */
+
+#toTop {
+    position: fixed;
+    display: inline-block;
+    bottom: 30px;
+    right: -40px;
+    width: 60px;
+    height: 60px;
+    z-index: 1000;
+    cursor: pointer;
+    text-align: center;
+    color: #fff;
+    border-radius: 4px;
+    background: rgb(0, 170, 212);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, .2);
+    opacity: 0;
+    visibility: hidden;
+    transition: all .3s ease-in-out;
+}
+
+#toTop:hover {
+    background: rgb(6, 93, 134);
+}
+
+#toTop i {
+    position: relative;
+    top: 12px;
+    right: -1px;
+    fill: #fff;
+    transition: all .3s ease-in-out;
+}
+
+#toTop:hover i {
+    cursor: pointer;
+    fill: #fff;
+    transition: all .3s ease-in-out;
+}
+
+#toTop.show {
+    opacity: 1;
+    visibility: visible;
+    right: calc(2%);
+}
+
+
+/* NAVBAR */
+
+.navbar {
+    text-transform: uppercase;
+    background-color: var(--mainbgcolor);
+    color: white;
+    padding-top: 70px !important;
+    padding-bottom: 70px !important;
+}
+
+.navbar-brand,
+.navbar-brand:hover,
+.navbar-brand:active {
+    color: var(--txtcolor) !important;
+    letter-spacing: 5px;
+}
+
+.carousel,
+.carousel img {
+    height: 410px;
+}
+
+.navbar-text {
+    color: white;
+}
+
+a {
+    color: white !important;
+}
+
+a:hover {
+    color: var(--hovertxtcolor) !important;
+}

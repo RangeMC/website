@@ -1,0 +1,39 @@
+@import "root.css";
+
+/* login */
+
+.logins-forms {
+    width: 500px;
+    background-color: var(--bgcolor);
+    padding: 50px;
+    border-radius: 8px;
+    margin-bottom: 150px;
+    margin: 0 auto;
+}
+
+.logins-forms button {
+    width: 150px !important;
+}
+
+
+/* registration */
+
+.regs-forms {
+    width: 700px;
+    background-color: var(--bgcolor);
+    padding: 50px;
+    border-radius: 8px;
+    margin-bottom: 150px;
+    margin: 0 auto;
+}
+
+.regs-forms button {
+    width: 220px !important;
+}
+
+
+/* footer */
+
+.footer {
+    margin-top: 100px;
+}

@@ -1,0 +1,39 @@
+.btn-padding {
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.btn-download {
+    background-color: var(--bgbtn) !important;
+    color: var(--txtcolor) !important;
+    border-radius: 25px !important;
+    font-size: 14px !important;
+}
+
+.btn-password {
+    background-color: #0DB4BE !important;
+    color: var(--txtcolor) !important;
+    border-radius: 25px !important;
+    font-size: 14px !important;
+}
+
+.btn-cape {
+    background-color: #E02394 !important;
+    color: var(--txtcolor) !important;
+    border-radius: 25px !important;
+    font-size: 14px !important;
+}
+
+.btn-leave-akk {
+    background-color: #EA4B28 !important;
+    color: var(--txtcolor) !important;
+    border-radius: 25px !important;
+    font-size: 14px !important;
+}
+
+.btn-i-cog {
+    background-color: white !important;
+    color: #323232 !important;
+    border-radius: 25px !important;
+    font-size: 14px !important;
+}

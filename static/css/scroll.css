@@ -1,0 +1,32 @@
+::-webkit-scrollbar {
+    /* 1 - скроллбар */
+    width: 6px;
+    height: 4px;
+    background-color: #555555;
+}
+
+::-webkit-scrollbar-button {
+    /* 2 - кнопка */
+}
+
+::-webkit-scrollbar-track {
+    /* 3 - трек */
+}
+
+::-webkit-scrollbar-track-piece {
+    /* 4 - видимая часть трека */
+}
+
+::-webkit-scrollbar-thumb {
+    /* 5 - ползунок */
+    border-radius: 2px;
+    background-color: #888888;
+}
+
+::-webkit-scrollbar-corner {
+    /* 6 - уголок */
+}
+
+::-webkit-resizer {
+    /* 7 - изменение размеров */
+}

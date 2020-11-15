@@ -1,30 +1,26 @@
 <%- include('../_header.ejs', { title: `Авторизация`, userLogin: userLogin }) %>
-<div class="text-center">
-    <span class="white-color">
-        <div id="head" class="parallax">
-            <h1>RangeMC Project</h1>
-            <h3>Комплекс серверов Minecraft</h3>
-        </div>
-        <br><form action="/panel/login" method="POST"><div style="background-color: black;" class="w-50 mx-auto window breakpoint-768-i">
-            <div class="text-center"><h4 style="color: white;">Авторизация</h4></div>
-            <%- (error) ? `<div id="error-login"><br><p style="background-color: red;" class="btn" onclick="document.getElementById('error-login').innerHTML = '';">${error}</p><br></div>` : "" %>
-            <div class="input-block pt-20">
-                <label style="color: white;" for="form-1">Логин аккаунта</label>
-                <input type="text" placeholder="Введите ваш никнейм в игре" name="login" id="form-1" required>
-                <div style="color: white;" class="input-helper">Данное поле является обязательным</div>
+<section class="container">
+    <div class="logins-forms">
+        <form class="form-signin" action="/panel/login" method="POST">
+            <div class="text-center">
+                <img class="mb-4" src="/static/img/favicon.png" alt="" width="130" height="130">
             </div>
-
-            <div class="input-block">
-                <label style="color: white;" for="form-2">Пароль аккаунта</label>
-                <input type="password" placeholder="Введите пароль для входа в нашем лаунчере" name="pass" id="form-2" required>
-                <div style="color: white;" class="input-helper">Данное поле является обязательным</div>
+            <h1 class="h2 mb-3 font-weight-normal text-center" style="color: white; text-transform: uppercase;">Авторизация</h1>
+            <%- (error) ? `<center><div id="error-login"><br><p class="btn btn-danger" onclick="document.getElementById('error-login').innerHTML = '';">${error}</p><br></div></center>` : "" %>
+            <label for="form-1" class="text-white text-left">Логин</label>
+            <input type="text" id="form-1" name="login" class="form-control" placeholder="Ваш логин" required>
+            <label for="form-2" class="text-white text-left">Пароль</label>
+            <input type="password" id="form-2" name="pass" class="form-control" placeholder="Пароль" required>
+            <div class="mb-3">
+                <label>
+                    <a target="_blank" href="https://vk.com/rangemc"> Забыли пароль?</a>
+                </label>
             </div>
-
-            <div class="pt-20 text-center">
-                <button type="submit" style="background-color: cadetblue;" class="btn">Авторизоваться</button> <a target="_blank" style="background-color: cornflowerblue;" class="btn" href="https://vk.me/rangemc">Забыли пароль?</a> <a style="background-color: #bd7979;" class="btn" href="/panel/register">Регистрация</a>
+            <div class="text-center">
+                <button type="submit" type="submit" class="btn btn-danger">Вход</button>
+                <a href="/panel/register"> <button type="button" class="btn btn-outline-secondary" style="color: white; background: transparent;">Регистрация</button> </a>
             </div>
-        </div></form>
-    </span>
-    <section id="banner" class="parallax"></section>
-</div>
+        </form>
+    </div>
+</section>
 <%- include('../_footer.ejs') %>

@@ -1,8 +1,9 @@
+const index = require('./index');
 require("dotenv").config();
 
 const checkGroup = async (ctx, group, callback) => {
     let author = String(ctx.message.from_id || ctx.message.user_id);
-    let user = await mysql.promise().query("SELECT * FROM accounts WHERE vk = ?", [author]);
+    let user = await index.mysql.promise().query("SELECT * FROM accounts WHERE vk = ?", [author]);
     if(!user[0][0])
         return ctx.reply("🚫 В базе данных нет аккаунта, привязанного на ваш ID страницы.");
     
@@ -15,7 +16,7 @@ const checkGroup = async (ctx, group, callback) => {
         "admin": 6
     };
 
-    let lpData = await mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
+    let lpData = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
     if(!lpData[0][0])
         return ctx.reply("🚫 О вас нет информации в базе с правами игроков.");
 
@@ -78,13 +79,13 @@ bot.on((ctx) => {
         return checkGroup(ctx, "admin", async () => {
             let login = args[0];
             if(!login) return ctx.reply("🚫 Правильное использование команды: unreg <логин>");
-            else return mysql.query("SELECT * FROM accounts WHERE login = ?", [login], (err, res) => {
+            else return index.mysql.query("SELECT * FROM accounts WHERE login = ?", [login], (err, res) => {
                 if(err) {
                     console.error(err);
                     return ctx.reply("🚫 Произошла ошибка. Проверьте консоль.");
                 } else {
                     if(!res[0]) return ctx.reply("🚫 Пользователя нет в базе.");
-                    else return mysql.query("DELETE FROM accounts WHERE login = ?", [login], (err) => {
+                    else return index.mysql.query("DELETE FROM accounts WHERE login = ?", [login], (err) => {
                         if(err) {
                             console.error(err);
                             return ctx.reply("🚫 Произошла ошибка. Проверьте консоль.");
@@ -99,14 +100,14 @@ bot.on((ctx) => {
         return checkGroup(ctx, "admin", async () => {
             let login = args[0];
             if(!login) return ctx.reply("🚫 Правильное использование команды: activate <логин>");
-            else return mysql.query("SELECT * FROM accounts WHERE login = ?", [login], (err, res) => {
+            else return index.mysql.query("SELECT * FROM accounts WHERE login = ?", [login], (err, res) => {
                 if(err) {
                     console.error(err);
                     return ctx.reply("🚫 Произошла ошибка. Проверьте консоль.");
                 } else {
                     if(!res[0]) return ctx.reply("🚫 Пользователя нет в базе.");
                     if(Number(res[0].blocked) == 0) return ctx.reply("🚫 Пользователь уже активирован.");
-                    else return mysql.query("UPDATE accounts SET blocked = ? WHERE login = ?", ["0", login], (err) => {
+                    else return index.mysql.query("UPDATE accounts SET blocked = ? WHERE login = ?", ["0", login], (err) => {
                         if(err) {
                             console.error(err);
                             return ctx.reply("🚫 Произошла ошибка. Проверьте консоль.");
@@ -121,14 +122,14 @@ bot.on((ctx) => {
         return checkGroup(ctx, "admin", async () => {
             let login = args[0];
             if(!login) return ctx.reply("🚫 Правильное использование команды: deactivate <логин>");
-            else return mysql.query("SELECT * FROM accounts WHERE login = ?", [login], (err, res) => {
+            else return index.mysql.query("SELECT * FROM accounts WHERE login = ?", [login], (err, res) => {
                 if(err) {
                     console.error(err);
                     return ctx.reply("🚫 Произошла ошибка. Проверьте консоль.");
                 } else {
                     if(!res[0]) return ctx.reply("🚫 Пользователя нет в базе.");
                     if(Number(res[0].blocked) == 1) return ctx.reply("🚫 Пользователь уже деактивирован.");
-                    else return mysql.query("UPDATE accounts SET blocked = ? WHERE login = ?", ["1", login], (err) => {
+                    else return index.mysql.query("UPDATE accounts SET blocked = ? WHERE login = ?", ["1", login], (err) => {
                         if(err) {
                             console.error(err);
                             return ctx.reply("🚫 Произошла ошибка. Проверьте консоль.");
@@ -143,7 +144,7 @@ bot.on((ctx) => {
         return checkGroup(ctx, "helper", async () => {
             let login = args[0];
             if(!login) return ctx.reply("🚫 Правильное использование команды: info <логин>");
-            else return mysql.query("SELECT * FROM accounts WHERE login = ?", [login], (err, res) => {
+            else return index.mysql.query("SELECT * FROM accounts WHERE login = ?", [login], (err, res) => {
                 if(err) {
                     console.error(err);
                     return ctx.reply("🚫 Произошла ошибка. Проверьте консоль.");
@@ -170,7 +171,7 @@ bot.on((ctx) => {
         return checkGroup(ctx, "helper", async () => {
             let login = args[0];
             if(!login) return ctx.reply("🚫 Правильное использование команды: skin <логин>");
-            else return mysql.query("SELECT * FROM skins WHERE login = ?", [login], (err, res) => {
+            else return index.mysql.query("SELECT * FROM skins WHERE login = ?", [login], (err, res) => {
                 if(err) {
                     console.error(err);
                     return ctx.reply("🚫 Произошла ошибка. Проверьте консоль.");
@@ -194,7 +195,7 @@ bot.on((ctx) => {
         return checkGroup(ctx, "helper", async () => {
             let login = args[0];
             if(!login) return ctx.reply("🚫 Правильное использование команды: cloak <логин>");
-            else return mysql.query("SELECT * FROM cloaks WHERE login = ?", [login], (err, res) => {
+            else return index.mysql.query("SELECT * FROM cloaks WHERE login = ?", [login], (err, res) => {
                 if(err) {
                     console.error(err);
                     return ctx.reply("🚫 Произошла ошибка. Проверьте консоль.");
@@ -215,4 +216,4 @@ bot.on((ctx) => {
     }
 });
 
-bot.startPolling().then(() => console.log("* RangeDevBot запущен."));
+bot.startPolling().then(() => console.log("Бот ВК запущен."));

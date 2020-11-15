@@ -1,62 +1,78 @@
 <%- include('../_header.ejs', { title: `Админ-панель`, userLogin: userLogin }) %>
-<div class="text-center">
-    <span class="white-color">
-        <div id="head" class="parallax">
-            <h1>RangeMC Project</h1>
-            <h3>Комплекс серверов Minecraft</h3>
+<div class="container pt-3">
+    <div class="edit-user p-4 mb-5">
+    <h1>Изменение аккаунта <%- account.login %></h1>
+  	<hr>
+	<div class="row">
+      
+      <!-- edit form column -->
+      <div class="col-md-9 personal-info">
+        <div class="alert alert-info alert-dismissable">
+          <a class="panel-close close" data-dismiss="alert">×</a> 
+          <i class="fa fa-coffee"></i>
+          Права выдаются через LuckPerms данной командой - <code>/lp user [никнейм] group switchprimarygroup [группа]</code>
         </div>
-        <br><div style="padding: 20px 20px 20px 20px; background-color: black; color: white;">
-            <h5>Управление пользователем</h5>
-            <br><form action="/panel/editUser" method="POST"><div style="background-color: black; color: white;" class="w-50 mx-auto window breakpoint-768-i">
-                <div class="input-block">
-                    <label style="color: white;" for="form-1">Логин аккаунта</label>
-                    <input type="text" value="<%- account.login %>" name="login" id="form-1" required>
-                    <div style="color: white;" class="input-helper">Данное поле является обязательным</div>
-                </div>
-
-                <div class="input-block">
-                    <label style="color: white;" for="form-2">Пароль к аккаунту</label>
-                    <input type="text" value="<%- account.pass %>" name="pass" id="form-2" required>
-                    <div style="color: white;" class="input-helper">Данное поле является обязательным</div>
-                </div>
-
-                <div class="input-block">
-                    <label style="color: white;" for="form-3">Уровень доступа (на сайте)</label>
-                    <select name="access" id="form-3" required aria-readonly="true" onclick="alert('Выдача ранга происходит из консоли сервера.')">
-                      <option <%- (account.access == 0) ? "selected" : "" %> value="0">Игрок</option>
-                      <option <%- (account.access == 1) ? "selected" : "" %> value="1">Хелпер</option>
-                      <option <%- (account.access == 2) ? "selected" : "" %> value="2">Модератор</option>
-                      <option <%- (account.access == 3) ? "selected" : "" %> value="3">Администратор</option>
-                      <option <%- (account.access == 4) ? "selected" : "" %> value="4">Разработчик</option>
-                    </select>
-                    <div style="color: white;" class="input-helper">Данное поле является обязательным</div>
-                </div>
-
-                <div class="input-block">
-                    <label style="color: white;" for="form-4">Блокировка аккаунта</label>
-                    <select name="blocked" id="form-4" required>
-                      <option <%- (account.blocked == 0) ? "selected" : "" %> value="0">Не заблокирован</option>
-                      <option <%- (account.blocked == 1) ? "selected" : "" %> value="1">Заблокирован</option>
-                    </select>
-                    <div style="color: white;" class="input-helper">Данное поле является обязательным</div>
-                </div>
-
-                <div class="input-block">
-                    <label style="color: white;" for="form-5">Кто пригласил его?</label>
-                    <input type="text" value="<%- account.invited_by %>" name="invited_by" id="form-5">
-                </div>
-
-                <div class="input-block">
-                    <label style="color: white;" for="form-6">VKID</label>
-                    <input type="number" value="<%- account.vk %>" name="vk" id="form-6">
-                </div>
-    
-                <div class="pt-20 text-center">
-                    <button type="submit" style="background-color: cadetblue;" class="btn">Сохранить</button> <a style="background-color: brown;" class="btn" href="/panel/deleteUser?login=<%- account.login %>">Удалить аккаунт</a> <a style="background-color: red;" href="/panel/admin" class="btn">Назад</a>
-                </div>
-            </div></form>
-        </div>
-    </span>
-    <section id="banner" class="parallax"></section>
+        
+        <form action="/panel/editUser" method="POST" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Логин:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" name="login" id="form-1" placeholder="<%- account.login %>" value="<%- account.login %>" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Статус:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" placeholder="<%- playerGroup[0][0].primary_group %>" value="<%- playerGroup[0][0].primary_group %>" required disabled>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Пароль (в md5):</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" name="pass" id="form-2" placeholder="<%- account.pass %>" value="<%- account.pass %>" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Баланс:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" name="balance" id="form-3" placeholder="<%- account.balance %>" value="<%- account.balance %>" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">UUID игрока:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" name="uuid" id="form-4" placeholder="<%- account.uuid %>" value="<%- account.uuid %>" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">VKID (для бота ВК):</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" name="vk" id="form-5" placeholder="<%- account.vk %>" value="<%- account.vk %>" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Блокировка входа:</label>
+            <div class="col-lg-8">
+              <div class="ui-select">
+                <select name="blocked" id="form-6" class="form-control" required>
+                  <option <%- (account.blocked == 0) ? "selected" : "" %> value="0">Не заблокирован</option>
+                  <option <%- (account.blocked == 1) ? "selected" : "" %> value="1">Заблокирован</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label"></label>
+            <div class="col-md-8">
+              <button type="submit" class="btn btn-primary">Сохранить</button></a>
+              <a href="/panel/deleteUser?login=<%- account.login %>"><button type="button" class="btn btn-danger">Удалить аккаунт</button></a>
+              <a href="/panel"><button type="button" class="btn btn-secondary">Назад</button></a>
+            </div>
+          </div>
+        </form>
+      </div>
+  </div>
 </div>
+</div>
+<hr>
 <%- include('../_footer.ejs') %>

@@ -2,6 +2,7 @@ const index = require('./index');
 const path = require("path");
 const uuid = require("uuid");
 const md5 = require("md5");
+const os = require('os');
 
 const Google = require("express-recaptcha").RecaptchaV3;
 const recaptcha = new Google('6Ld7KNgZAAAAACD5dy4xH0PthgsLSL1ZH0eXf03K', '6Ld7KNgZAAAAAE1gPNIeuPt-7LsAb32ZDq5RRqA6', { hl: 'ru', callback: 'insertToForm' });
@@ -51,9 +52,9 @@ const express = require('express');
 const userGroups = {
     default: "Игрок",
     helper: "Хелпер",
-    moder: "Модератор",
-    stmoder: "Старший модератор",
-    devel: "Разработчик",
+    moder: "Модер",
+    stmoder: "Ст.Модер",
+    devel: "Разраб",
     admin: "Админ"
 };
 
@@ -62,16 +63,19 @@ const errors = {
     Found: "Такой аккаунт уже существует.",
     RecaptchaError: "Не пройдена проверка на бота.",
     IncorrectPassword: "Указан неверный пароль к аккаунту.",
-    Deactivated: "Ваш аккаунт деактивирован администратором.",
+    Deactivated: "Ваш аккаунт заблокирован администрацией.",
     Logout: "Вы вышли из аккаунта. Всего доброго! c:"
 };
 
 const args = {
-    SuccessRegistration: "Вы успешно зарегистрировались на RangeMC.",
-    SuccessPasswordChange: "Вы успешно сменили пароль к аккаунту.",
-    SuccessSkinChange: "Вы успешно сменили скин в игре.",
-    SuccessCloakChange: "Вы успешно сменили плащ в игре.",
-    AccessDenied: "У Вас нет доступа к данной странице."
+    SuccessAddUser: "<h1 style='color: #33FF00;'>УСПЕШНО!</h1><h3 style='color: #FFEEFF;'>ВЫ СОЗДАЛИ НОВЫЙ <br> АККАУНТ ИГРОКА</h3>",
+    SuccessEditUser: "<h1 style='color: #33FF00;'>УСПЕШНО!</h1><h3 style='color: #FFEEFF;'>ВЫ ИЗМЕНИЛИ ДАННЫЕ <br> АККАУНТА ИГРОКА</h3>",
+    SuccessDeleteUser: "<h1 style='color: #33FF00;'>УСПЕШНО!</h1><h3 style='color: #FFEEFF;'>ВЫ НАВСЕГДА УДАЛИЛИ <br> АККАУНТ ИГРОКА</h3>",
+    SuccessRegistration: "<h1 style='color: #33FF00;'>УСПЕШНО!</h1><h3 style='color: #FFEEFF;'>ВЫ ЗАРЕГИСТРИРОВАЛИСЬ <br> НА RANGEMC</h3>",
+    SuccessPasswordChange: "<h1 style='color: #33FF00;'>УСПЕШНО!</h1><h3 style='color: #FFEEFF;'>ВЫ СМЕНИЛИ ПАРОЛЬ К <br> ВАШЕМУ АККАУНТУ</h3>",
+    SuccessSkinChange: "<h1 style='color: #33FF00;'>УСПЕШНО!</h1><h3 style='color: #FFEEFF;'>ВЫ СМЕНИЛИ СКИН <br> ВАШЕГО АККАУНТА</h3>",
+    SuccessCloakChange: "<h1 style='color: #33FF00;'>УСПЕШНО!</h1><h3 style='color: #FFEEFF;'>ВЫ СМЕНИЛИ ПЛАЩ <br> ВАШЕГО АККАУНТА</h3>",
+    AccessDenied: "<h1 style='color: #F1FFA3;'>СОЖАЛЕЮ!</h1><h3 style='color: #FFEEFF;'>У ВАС НЕТ ДОСТУПА К <br> ДАННОЙ СТРАНИЦЕ</h3>"
 };
 
 function errorProcess(error) {
@@ -109,29 +113,39 @@ router.get("/", (req, res) => {
                     .catch(console.error);
                     index.mysql.query("SELECT * FROM punishments WHERE username = ? AND type = 'BAN' OR type = 'TEMPBAN' LIMIT 1", [user[0][0].login], (err, bans) => {
                         if(err) throw err;
-                        return res.render("panel/index", { account: user[0][0], moment: moment, bans: bans, userGroup: userGroup, userGroups: userGroups, userLogin: req.cookies.userLogin || "Личный кабинет" });
+                        let arch = os.arch();
+                        let platform = os.platform();
+                        let type = os.type();
+                        let hostname = os.hostname();
+                        let cpus = os.cpus();
+                        let release = os.release();
+                        return index.mysql.promise().query("SELECT * FROM accounts")
+                        .then((accounts) => res.render("panel/index", { release: release, cpus: cpus, arch: arch, platform: platform, type: type, hostname: hostname, account: user[0][0], accounts: accounts[0], moment: moment, bans: bans, userGroup: userGroup, userGroups: userGroups, userLogin: req.cookies.userLogin || "Личный кабинет" }));
                     });
             }
         }).catch(console.error);
 });
 
-router.get("/cloak", (req, res) => {
+router.get("/data", (req, res) => {
     if(!req.cookies.loginHash) return res.redirect("/panel/login");
     index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
-        .then((user) => {
+        .then(async (user) => {
             if(!user[0][0]) {
                 res.cookie("loginHash", null, { maxAge: -1 });
                 res.cookie("userLogin", null, { maxAge: -1 });
                 return res.redirect("/panel/login");
             } else {
-                if(req.query.error) return res.render("panel/cloak", { error: errorProcess(req.query.error), userLogin: req.cookies.userLogin || "Личный кабинет" });
-                else return res.render("panel/cloak", { error: null, userLogin: req.cookies.userLogin || "Личный кабинет" });
-            }
-        }).catch(console.error);
-});
-
-router.get("/download", (req, res) => {
-    return res.redirect("/../launcher");
+                let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
+                if(!userGroup[0][0]) return index.mysql.promise().query("INSERT INTO luckperms_players (uuid, username, primary_group) VALUES (?, ?, ?)", [user[0][0].uuid, user[0][0].login, "default"])
+                    .then(() => res.redirect("/panel/event?type=SuccessRegistration"))
+                    .catch(console.error);
+                    index.mysql.query("SELECT * FROM punishments WHERE username = ? AND type = 'BAN' OR type = 'TEMPBAN' LIMIT 1", [user[0][0].login], (err, bans) => {
+                        if(err) throw err;
+                        return index.mysql.promise().query("SELECT * FROM accounts")
+                        .then((accounts) => res.render("panel/data", { account: user[0][0], userGroup: userGroup, userGroups: userGroups, userLogin: req.cookies.userLogin || "Личный кабинет" }));
+                });
+        }
+    }).catch(console.error);
 });
 
 router.get("/admin", (req, res) => {
@@ -145,39 +159,8 @@ router.get("/admin", (req, res) => {
             } else {
                 let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
                 if(!["admin"].includes(userGroup[0][0].primary_group)) return res.redirect("/panel/event?type=AccessDenied");
-                else return index.mysql.promise().query("SELECT * FROM accounts")
-                    .then((accounts) => res.render("panel/admin", { accounts: accounts[0], userLogin: req.cookies.userLogin || "Личный кабинет" })).catch(console.error);
+                else return res.redirect("/panel");
             }
-        }).catch(console.error);
-});
-
-router.get("/newUser", (req, res) => {
-    if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
-        .then(async (user) => {
-            if(!user[0][0]) {
-                res.cookie("loginHash", null, { maxAge: -1 });
-                res.cookie("userLogin", null, { maxAge: -1 });
-                return res.redirect("/panel/login");
-            } else {
-                let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
-                if(!["admin"].includes(userGroup[0][0].primary_group)) return res.redirect("/panel/event?type=AccessDenied");
-                else return index.mysql.promise().query("SELECT * FROM accounts")
-                    .then((accounts) => res.render("panel/newUser", { accounts: accounts[0], userLogin: req.cookies.userLogin || "Личный кабинет" })).catch(console.error);
-            }
-        }).catch(console.error);
-});
-
-router.get("/list", (req, res) => {
-    if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
-        .then((user) => {
-            if(!user[0][0]) {
-                res.cookie("loginHash", null, { maxAge: -1 });
-                res.cookie("userLogin", null, { maxAge: -1 });
-                return res.redirect("/panel/login");
-            } else return index.mysql.promise().query("SELECT * FROM accounts")
-                .then((accounts) => res.render("panel/list", { accounts: accounts[0], userLogin: req.cookies.userLogin || "Личный кабинет" })).catch(console.error);
         }).catch(console.error);
 });
 
@@ -190,11 +173,11 @@ router.get("/apply/:nickname", (req, res) => {
                 res.cookie("userLogin", null, { maxAge: -1 });
                 return res.redirect("/panel/login");
             } else {
-                if(!['skin', 'cloak'].includes(req.query.type)) return res.redirect("/panel/list");
+                if(!['skin', 'cloak'].includes(req.query.type)) return res.redirect("/panel");
                 if(req.query.accept == "true")
                     return index.mysql.promise().query(`SELECT * FROM ${(req.query.type == "skin") ? "skins" : (req.query.type == "cloak") ? "cloaks" : "undefined"} WHERE login = ?`, [req.params.nickname])
                         .then((item) => {
-                            if(!item[0][0]) return res.redirect("/panel/list");
+                            if(!item[0][0]) return res.redirect("/panel");
                             else return index.mysql.promise().query(`UPDATE ${(req.query.type == "skin") ? "skins" : (req.query.type == "cloak") ? "cloaks" : "undefined"} SET hash = ? WHERE login = ?`, [item[0][0].hash, user[0][0].login])
                                 .then(() => {
                                     // rcon.send(`kick ${user[0][0].login} @${(req.query.type == "skin") ? "Skin" : (req.query.type == "cloak") ? "Cloak" : "undefined"}Changed`);
@@ -208,25 +191,9 @@ router.get("/apply/:nickname", (req, res) => {
                         }).catch(console.error);
                 else return index.mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.params.nickname])
                     .then((accounts) => {
-                        if(!accounts[0][0]) return res.redirect("/panel/list");
-                        else return res.render("panel/apply", { account: accounts[0], type: req.query.type, userLogin: req.cookies.userLogin || "Личный кабинет" });
+                        if(!accounts[0][0]) return res.redirect("/panel");
+                        else return res.redirect("/panel");
                     }).catch(console.error);
-            }
-        }).catch(console.error);
-});
-
-router.get("/console", (req, res) => {
-    if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
-        .then(async (user) => {
-            if(!user[0][0]) {
-                res.cookie("loginHash", null, { maxAge: -1 });
-                res.cookie("userLogin", null, { maxAge: -1 });
-                return res.redirect("/panel/login");
-            } else {
-                let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
-                if(!["admin"].includes(userGroup[0][0].primary_group)) return res.redirect("https://yadi.sk/i/HIJpMdEMgUqxcA");
-                else return res.render("panel/console", { account: user[0][0], userLogin: req.cookies.userLogin || "Личный кабинет" });
             }
         }).catch(console.error);
 });
@@ -243,22 +210,12 @@ router.get("/admin/:login", (req, res) => {
                 let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
                 if(!["admin"].includes(userGroup[0][0].primary_group)) return res.redirect("/panel/event?type=AccessDenied");
                 else return index.mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.params.login])
-                    .then((accounts) => {
-                        if(accounts[0][0].access < 4) return res.render("panel/userEdit", { account: accounts[0][0], userLogin: req.cookies.userLogin || "Личный кабинет" });
-                        else return res.redirect("/panel/event?type=AccessDenied");
+                    .then(async (accounts) => {
+                        let playerGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [req.params.login.toLowerCase()]);
+                        if(["admin"].includes(playerGroup[0][0].primary_group)) return res.redirect("/panel/event?type=AccessDenied");
+                        else return res.render("panel/userEdit", { playerGroup: playerGroup, account: accounts[0][0], userLogin: req.cookies.userLogin || "Личный кабинет" });
                     }).catch(console.error);
             }
-        }).catch(console.error);
-});
-
-router.get("/sendCommand", (req, res) => {
-    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
-        .then(async (user) => {
-            if(!user[0][0]) return res.redirect("/");
-            let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
-            if(!["admin"].includes(userGroup[0][0].primary_group)) return res.redirect("/panel/event?type=AccessDenied");
-            else return rcon.send(req.query.command)
-                .then((r) => res.json({ command: req.query.command, log: r.replace(/§./g, "") || "Сервер вернул пустой ответ." }));
         }).catch(console.error);
 });
 
@@ -272,7 +229,7 @@ router.post("/addUser", (req, res) => {
                 .then((accounts) => {
                     if(accounts[0][0]) return res.redirect("/panel/admin");
                     else return index.mysql.promise().query("INSERT INTO accounts (login, pass) VALUES (?, MD5(?))", [req.body.login, req.body.pass])
-                        .then(() => res.redirect("/panel/admin?type=SuccessAddUser")).catch(console.error);
+                        .then(() => res.redirect("/panel/event?type=SuccessAddUser")).catch(console.error);
                 }).catch(console.error);
         }).catch(console.error);
 });
@@ -284,13 +241,14 @@ router.post("/editUser", (req, res) => {
             let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
             if(!["admin"].includes(userGroup[0][0].primary_group)) return res.redirect("/panel/event?type=AccessDenied");
             else return index.mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.body.login])
-                .then((accounts) => {
+                .then(async (accounts) => {
                     if(!accounts[0][0]) return res.redirect("/panel/admin");
-                    if(accounts[0][0].access < 4)
-                        return index.mysql.promise().query("UPDATE accounts SET login = ?, pass = MD5(?), access = ?, blocked = ?, invited_by = ?, vk = ? WHERE login = ?", [req.body.login, req.body.pass, req.body.access, req.body.blocked, ((req.body.invited_by.length <= 3) ? null : req.body.invited_by), req.body.vk, req.body.login])
+                    let playerGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [req.body.login.toLowerCase()]);
+                    if(!["admin"].includes(playerGroup[0][0].primary_group))
+                        return index.mysql.promise().query("UPDATE accounts SET login = ?, pass = ?, balance = ?, uuid = ?, vk = ?, blocked = ? WHERE login = ?", [req.body.login, req.body.pass, req.body.balance, req.body.uuid, req.body.vk, req.body.blocked, req.body.login])
                             .then(() => {
                                 // rcon.send(`kick ${accounts[0][0].login} @AccountEdited`);
-                                return res.redirect("/panel/admin?type=SuccessEditUser");
+                                return res.redirect("/panel/event?type=SuccessEditUser");
                             }).catch(console.error);
                     else
                         return res.redirect("/panel/event?type=AccessDenied");
@@ -305,12 +263,13 @@ router.get("/deleteUser", (req, res) => {
             let userGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [user[0][0].login.toLowerCase()]);
             if(!["admin"].includes(userGroup[0][0].primary_group)) return res.redirect("/panel/event?type=AccessDenied");
             else return index.mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.query.login])
-                .then((accounts) => {
+                .then(async (accounts) => {
                     if(!accounts[0][0]) return res.redirect("/panel/admin");
                     else {
-                        if(accounts[0][0].access < 4)
+                        let playerGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [req.query.login.toLowerCase()]);
+                        if(!["admin"].includes(playerGroup[0][0].primary_group))
                             return index.mysql.promise().query("DELETE FROM accounts WHERE login = ?", [req.query.login])
-                                .then(() => res.redirect("/panel/admin?type=SuccessDeleteUser")).catch(console.error);
+                                .then(() => res.redirect("/panel/event?type=SuccessDeleteUser")).catch(console.error);
                         else
                             return res.redirect("/panel/event?type=AccessDenied");
                     }
@@ -318,50 +277,8 @@ router.get("/deleteUser", (req, res) => {
         }).catch(console.error);
 });
 
-router.get("/data", (req, res) => {
-    if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
-        .then((user) => {
-            if(!user[0][0]) {
-                res.cookie("loginHash", null, { maxAge: -1 });
-                res.cookie("userLogin", null, { maxAge: -1 });
-                return res.redirect("/panel/login");
-            } else return res.render("panel/data", { account: user[0][0], userLogin: req.cookies.userLogin || "Личный кабинет" });
-        }).catch(console.error);
-});
-
 router.get("/event", (req, res) => {
     res.render("panel/event", { type: eventProcess(req.query.type), userLogin: req.cookies.userLogin || "Личный кабинет" });
-});
-
-router.get("/skin", (req, res) => {
-    if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
-        .then((user) => {
-            if(!user[0][0]) {
-                res.cookie("loginHash", null, { maxAge: -1 });
-                res.cookie("userLogin", null, { maxAge: -1 });
-                return res.redirect("/panel/login");
-            } else {
-                if(req.query.error) return res.render("panel/skin", { error: errorProcess(req.query.error), userLogin: req.cookies.userLogin || "Личный кабинет" });
-                else return res.render("panel/skin", { error: null, userLogin: req.cookies.userLogin || "Личный кабинет" });
-            }
-        }).catch(console.error);
-});
-
-router.get("/viewSkin", (req, res) => {
-    if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
-        .then((user) => {
-            if(!user[0][0]) {
-                res.cookie("loginHash", null, { maxAge: -1 });
-                res.cookie("userLogin", null, { maxAge: -1 });
-                return res.redirect("/panel/login");
-            } else {
-                if(req.query.error) return res.render("panel/viewSkin", { error: errorProcess(req.query.error), userLogin: req.cookies.userLogin || "Личный кабинет" });
-                else return res.render("panel/viewSkin", { error: null, userLogin: req.cookies.userLogin || "Личный кабинет" });
-            }
-        }).catch(console.error);
 });
 
 router.post("/skin", (req, res, next) => {
@@ -429,42 +346,12 @@ router.post("/cloak", (req, res, next) => {
         }).catch(console.error);
 });
 
-router.get("/viewCloak", (req, res) => {
-    if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
-        .then((user) => {
-            if(!user[0][0]) {
-                res.cookie("loginHash", null, { maxAge: -1 });
-                res.cookie("userLogin", null, { maxAge: -1 });
-                return res.redirect("/panel/login");
-            } else {
-                if(req.query.error) return res.render("panel/viewCloak", { error: errorProcess(req.query.error), userLogin: req.cookies.userLogin || "Личный кабинет" });
-                else return res.render("panel/viewCloak", { error: null, userLogin: req.cookies.userLogin || "Личный кабинет" });
-            }
-        }).catch(console.error);
-});
-
-router.get("/password", (req, res) => {
-    if(!req.cookies.loginHash) return res.redirect("/panel/login");
-    index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
-        .then((user) => {
-            if(!user[0][0]) {
-                res.cookie("loginHash", null, { maxAge: -1 });
-                res.cookie("userLogin", null, { maxAge: -1 });
-                return res.redirect("/panel/login");
-            } else {
-                if(req.query.error) return res.render("panel/password", { error: errorProcess(req.query.error), userLogin: req.cookies.userLogin || "Личный кабинет" });
-                else return res.render("panel/password", { error: null, userLogin: req.cookies.userLogin || "Личный кабинет" });
-            }
-        }).catch(console.error);
-});
-
 router.post("/password", (req, res) => {
     index.mysql.promise().query("SELECT * FROM accounts WHERE lk_cookie = ?", [req.cookies.loginHash])
         .then((user) => {
             if(!user[0][0]) return res.redirect("/");
             else {
-                if(user[0][0].pass !== md5(req.body.passold)) return res.redirect("/panel/password?error=IncorrectPassword");
+                if(user[0][0].pass !== md5(req.body.passold)) return res.redirect("/panel/event?type=IncorrectPassword");
                 else {
                     index.mysql.promise().query("UPDATE accounts SET pass = MD5(?) WHERE login = ?", [req.body.passnew, user[0][0].login]);
                     // rcon.send(`kick ${user[0][0].login} @PasswordChanged`);
@@ -482,14 +369,6 @@ router.get("/login", (req, res) => {
     }
 });
 
-router.get("/video/:type", (req, res) => {
-    if(req.cookies.loginHash) return res.redirect("/panel");
-    else {
-        if(req.query.error) return res.render("panel/login", { error: errorProcess(req.query.error), userLogin: req.cookies.userLogin || "Личный кабинет" });
-        else return res.render("panel/video", { type: req.params.type, userLogin: req.cookies.userLogin || "Личный кабинет" });
-    }
-});
-
 router.post("/login", (req, res) => {
     index.mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.body.login])
         .then((user) => {
@@ -497,14 +376,8 @@ router.post("/login", (req, res) => {
             else {
                 if(user[0][0].pass !== md5(req.body.pass)) return res.redirect("/panel/login?error=IncorrectPassword");
                 else {
-                    if(user[0][0].blocked == 1) { // return res.redirect("/panel/login?error=Deactivated");
-                        function randomInteger(min, max) {
-                            let rand = min - 0.5 + Math.random() * (max - min + 1);
-                            return Math.round(rand);
-                        }
-
-                        let arr = ["deactivated", "500", "503", "409", "brain"];
-                        return res.redirect(`/panel/video/${arr[randomInteger(0, (arr.length - 1))] || arr[1]}`);
+                    if(user[0][0].blocked == 1) {
+                       return res.redirect("/panel/login?error=Deactivated");
                     } else {
                         let hash = uuid.v4();
                         res.cookie("loginHash", hash, { maxAge: (86400 * 1000) });
@@ -526,7 +399,6 @@ router.get("/register", (req, res) => {
 });
 
 router.post("/register", recaptcha.middleware.verify, (req, res) => {
-    console.log(req.body);
     index.mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.body.login])
         .then((user) => {
             if(user[0][0]) return res.redirect("/panel/register?error=Found");
@@ -555,12 +427,12 @@ router.get("/logout", (req, res) => {
 });
 
 router.use((req, res, next) => {
-    res.status(404).render("error", { error: 404, errorProcessed: "Страница не найдена, дурашка. >:C", userLogin: req.cookies.userLogin || "Личный кабинет" });
+    res.status(404).render("error", { error: 404, errorProcessed: `Страница, которую вы ищите была <br>перемещена, удалена или её никогда <br> не существовало.`, userLogin: req.cookies.userLogin || "Личный кабинет" });
 });
 
 router.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).render("error", { error: 500, errorProcessed: "Внутренняя ошибка сервера. Обратитесь в нашу группу ВКонтакте.", userLogin: req.cookies.userLogin || "Личный кабинет" });
+    res.status(500).render("error", { error: 500, errorProcessed: "Произошла внутренняя ошибка сервера, <br> обратитесь в нашу группу ВКонтакте.", userLogin: req.cookies.userLogin || "Личный кабинет" });
 });
 
 module.exports = router;

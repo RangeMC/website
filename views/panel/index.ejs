@@ -1,48 +1,279 @@
 <%- include('../_header.ejs', { title: `Личный кабинет`, userLogin: userLogin }) %>
-<div class="text-center">
-    <span class="white-color">
-        <div id="head" class="parallax">
-            <h1>RangeMC Project</h1>
-            <h3>Комплекс серверов Minecraft</h3>
+<section class="container">
+    <div class="row mt-5 mb-5">
+        <div class="col-md-3">
+            <div class="skins-block mb-3">
+                <div class="container">
+                    <div class="skins--block">
+                        <center>
+                            <div class="model-skin">
+                                <div class="pt-4">
+                                    <img src="https://skins.rangemc.ovh/body/<%- account.login %>.png" alt="" width="65%">
+                                </div>
+                            </div>
+                            <div class="">
+                                <div class="btn-padding">
+                                    <button type="button" class="btn btn-download" data-toggle="modal" data-target="#changeSkin">Изменить скин</button>
+                                </div>
+                            </div>
+                        </center>
+                    </div>
+                </div>
+            </div>
         </div>
-        <br><div style="padding: 20px 20px 20px 20px; background-color: black; color: white;">
-            <center><p>
-                Привет, <b><%- account.login %></b>!
-                <br>Ваш основной ранг: <b><%- userGroups[userGroup[0][0].primary_group] %></b>
-                <br>Ваш баланс - <b><%- account.balance %></b> монеток.
-                <% bans.forEach((user) => { %>
-                    <% if (user.time == 0) { %>
-                      <% var perm = "никогда не закончится"; %>
-                      <% } else { %>
-                        <% var enddate = moment(new Date(Number(user.time))).utcOffset(3).locale('ru').format('lll'); %>
-                        <% } %>
-                        <% if (user.punishmentType == "BAN") { %>
-                            <% var ban = "бан"; %>
-                            <% }%>
-                              <% if (user.type == "TEMPBAN") { %>
-                                <% var type = "временная блокировка"; %>
-                                <% var ending = ", которая закончится в " + enddate; %>
-                                <% var color = "color: orange;"; %>
-                                <% var info = "Чтобы убрать статус временной блокировки из личного кабинета и списка наказаний, после её окончания вам необходимо хоть раз зайти на сервер." %>
-                                 <% }%>
-                                 <% if (user.type == "BAN") { %>
-                                    <% var type = "постоянная блокировка"; %>
-                                    <% var color = "color: red;"; %>
-                                    <% var info = "Данную блокировку может снять только персонал проекта. Если вы считаете что это ошибка, обратитесь в нашу группу ВКонтакте." %>
-                                     <% }%>
-                                        <% if (user.reason == null) { %>
-                                        <% var srvundef = "неизвестно"; %>
-                                        <% }%>
-                                            <% if (user.admin == "CONSOLE") { %>
-                                            <% var srvconsole = "консолью"; %>
-                                                <% }%>
-                <br><br><a style="<%- color %>">У вас имеется <%- type || "неизвестная" %>, выданная <%- srvconsole || user.admin || "неизвестным игроком" %> в <%- moment(new Date(Number(user.expire))).utcOffset(3).locale('ru').format('lll') || "неизвестно" %> за <%- "нарушение правила " + user.reason || "неизвестно" %><%- ending || "." %></a>
-                <br><a style="<%- color %>"><%- info %></a>
+        <div class="col-md-9">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="infos-block-height-1 mb-3 p-4">
+                        <div class="info-player">
+                            <div class="container">
+                                <div class="row">
+                                    <ul class="nicks-block mr-2">
+                                        <li class="">
+                                            <p>Никнейм</p>
+                                        </li>
+                                        <li class="">
+                                            <p><strong><%- account.login %></strong></p>
+                                        </li>
+                                    </ul>
+                                    <ul class="status-block mr-2">
+                                        <li class="">
+                                            <p>Статус</p>
+                                        </li>
+                                        <li class="">
+                                            <p><strong><%- userGroups[userGroup[0][0].primary_group] %></strong></p>
+                                        </li>
+                                    </ul>
+                                    <ul class="money-block mr-2">
+                                        <li class="">
+                                            <p class="">Монетки</p>
+                                        </li>
+                                        <li class="">
+                                            <p><strong><%- account.balance %></strong></p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="buttons-player">
+                            <div class="container pl-4">
+                                <button type="button" class="btn btn-password mr-2" data-toggle="modal" data-target="#changePass">Сменить пароль</button></a>
+                                <button type="button" class="btn btn-cape mr-2" data-toggle="modal" data-target="#changeCloak">Сменить плащ</button>
+                                <a class="mr-2" href="/panel/logout"><button type="button" class="btn btn-leave-akk">Выйти с аккаунта</button></a>
+                                <%- (["admin"].includes(userGroup[0][0].primary_group)) ? `<button type="button" class="btn btn-i-cog" data-toggle="modal" data-target="#systemInfo"><i class="fa fa-cog"></i></button> ` : "" %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="infos-block-height-2 mb-3">
+                        <div class="container">
+                            <div class="p-4">
+                            <% function isEmptyObject(obj) { %>
+                                <% for (var key in obj) { %>
+                                    <% if (Object.prototype.hasOwnProperty.call(obj, key)) { %>
+                                        <%  return false; %>
+                                        <% } %> 
+                                        <% } %>
+                                        <% return true; %>
+                                        <% } %>
+                            <% if (isEmptyObject(bans)) { %>
+                                <p class="text-success">Блокировок на вашем аккаунте не обнаружено, спасибо за честную игру :)</p>
+                                <p class="text-success">Чтобы никогда их не получать, рекомендуем ознакомиться с <a target="_blank" href="https://wiki.rangemc.ovh/info/rules">правилами</a> проекта. Если же вы заметите нарушение правил со стороны других игроков, используйте команду /report или напишите в нашу <a target="_blank" href="https://vk.com/rangemc_dev">группу разработчиков</a> для подачи жалобы.</p>
+                            <% } else {%>
+                                <% bans.forEach((user) => { %>
+                                    <% if (user.time == 0) { %>
+                                      <% var perm = "никогда не закончится"; %>
+                                      <% } else { %>
+                                        <% var enddate = moment(new Date(Number(user.time))).utcOffset(3).locale('ru').format('lll'); %>
+                                        <% } %>
+                                        <% if (user.punishmentType == "BAN") { %>
+                                            <% var ban = "бан"; %>
+                                            <% }%>
+                                              <% if (user.type == "TEMPBAN") { %>
+                                                <% var type = "временная блокировка"; %>
+                                                <% var ending = ", которая закончится в " + enddate; %>
+                                                <% var color = "text-warning"; %>
+                                                <% var info = "Чтобы убрать статус временной блокировки из личного кабинета и списка наказаний, после её окончания вам необходимо хоть раз зайти на сервер." %>
+                                                 <% }%>
+                                                 <% if (user.type == "BAN") { %>
+                                                    <% var type = "постоянная блокировка"; %>
+                                                    <% var color = "text-danger"; %>
+                                                    <% var info = "Данную блокировку может снять только администрация проекта. Если вы считаете что это ошибка, обратитесь в нашу группу ВКонтакте." %>
+                                                     <% }%>
+                                                        <% if (user.reason == null) { %>
+                                                        <% var srvundef = "неизвестно"; %>
+                                                        <% }%>
+                                                            <% if (user.admin == "CONSOLE") { %>
+                                                            <% var srvconsole = "консолью"; %>
+                                                                <% }%>
+                                <p class="<%- color %>">У вас имеется <%- type || "неизвестная" %>, выданная <%- srvconsole || user.admin || "неизвестным игроком" %> в <%- moment(new Date(Number(user.expire))).utcOffset(3).locale('ru').format('lll') || "неизвестно" %> за <%- "нарушение правила " + user.reason || "неизвестно" %><%- ending || "." %></p>
+                                <p class="<%- color %>"><%- info %></p>
+                                <% }); } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+
+
+<section class="container">
+    <div class="player-list p-4 mb-5">
+        
+        <table class="table table-dark table-hover table-borderless text-center p-4">
+            <thead>
+                <tr>
+                    <% if (userGroup[0][0].primary_group == "admin") { %>
+                        <th>ID</th>
+                        <th>ЛОГИН</th>
+                        <th>VKID</th>
+                        <th>UUID</th>
+                        <th>МОНЕТКИ</th>
+                        <th>УСТАНОВИТЬ</th>
+                    <% } else { %>
+                        <th>ID</th>
+                        <th>ЛОГИН АККАУНТА</th>
+                        <th>КОЛИЧЕСТВО МОНЕТОК</th>
+                        <th>УСТАНОВИТЬ СКИН/ПЛАЩ</th>
+                    <% } %>
+                </tr>
+            </thead>
+            <tbody>
+                <% accounts.forEach((user) => { %>
+                <tr>
+                    <% if (userGroup[0][0].primary_group == "admin") { %>
+                        <td><%- user.id %></td>
+                        <td><a href="/panel/admin/<%- user.login %>"><%- user.login %></a></td>
+                        <td><%- user.vk %></td>
+                        <td><%- user.uuid %></td>
+                        <td><%- user.balance %></td>
+                        <td><a href="/panel/apply/<%- user.login %>?type=skin&accept=true">Скин</a> | <a href="/panel/apply/<%- user.login %>?type=cloak&accept=true">Плащ</a></td>
+                    <% } else { %>
+                        <td><%- user.id %></td>
+                        <td><%- user.login %></td>
+                        <td><%- user.balance %></td>
+                        <td><a href="/panel/apply/<%- user.login %>?type=skin&accept=true">Скин</a> | <a href="/panel/apply/<%- user.login %>?type=cloak&accept=true">Плащ</a></td>
+                    <% } %>
+                </tr>
                 <% }); %>
-                <br><br><%- (["admin"].includes(userGroup[0][0].primary_group)) ? `<a href="/panel/admin" class="btn">Админ-панель</a> ` : "" %><a href="/panel/list" class="btn">Список игроков</a> <a style="background-color: green;" href="/launcher" class="btn">Скачать лаучнер</a> <a href="/panel/password" class="btn">Сменить пароль</a> <a href="/panel/skin" class="btn">Сменить скин</a> <a href="/panel/cloak" class="btn">Сменить плащ</a> <a style="background-color: red;" href="/panel/logout" class="btn">Выйти из аккаунта</a>
-            </p></center>
+            </tbody>
+        </table>
+
+
+    </div>
+</section>
+
+
+<section class="container">
+    <div class="launcher-block mb-5 p-4">
+        <div class="launcher-text text-center">
+            <p>Инструкцию по запуску лаунчера можно посмотреть здесь: <a href="https://wiki.rangemc.ovh/launcher/usage" target="_blank"><span>клик</span></a></p>
+            <p>Выберите платформу: <a href="https://launcher.rangemc.ovh/RangeMC.exe">WINDOWS</a> <a href="https://launcher.rangemc.ovh/RangeMC.jar">MACOS</a> <a href="https://launcher.rangemc.ovh/RangeMC.jar">LINUX</a></p>
         </div>
-    </span>
-    <section id="banner" class="parallax"></section>
+    </div>
+</section>
+
+
+<!-- Modal Skin -->
+<div class="modal fade" id="changeSkin" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Смена скина</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/panel/skin" method="POST" enctype="multipart/form-data">
+            <div class="modal-body">
+                <p>Скин должен быть в формате *.png <br> Размеры скина должны быть 64х32 или 64x64 пикселей (макс. 1МБ)</p>
+                <input type="file" name="skin" id="form-1" class="form-control" required>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Установить</button>
+            </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<!-- Modal Cloak -->
+<div class="modal fade" id="changeCloak" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Смена плаща</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/panel/cloak" method="POST" enctype="multipart/form-data">
+            <div class="modal-body">
+                <p>Плащ должен быть в формате *.png <br> Размеры плаща должны быть 22х17 или 64х32 пикселей</p>
+                <input type="file" name="cloak" id="form-1" class="form-control" required>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Установить</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Password -->
+<div class="modal fade" id="changePass" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Смена пароля</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <form action="/panel/password" method="POST">
+          <div class="modal-body">
+                <label for="form-1" class="text-white text-left"><a class="text-dark">Старый пароль</a></label>
+                <input type="password" id="form-1" name="passold" class="form-control" placeholder="Старый пароль" required>
+                <br>
+                <label for="form-2" class="text-white text-left"><a class="text-dark">Новый пароль</a></label>
+                <input type="password" id="form-2" name="passnew" class="form-control" placeholder="Новый пароль" required>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Установить</button>
+          </div>
+        </form>
+        </div>
+      </div>
+</div>
+
+<% if (userGroup[0][0].primary_group == "admin") { %>
+<!-- Modal systemInfo -->
+<div class="modal fade" id="systemInfo" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Информация о системе</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+                <p>Платформа - <%- platform %></p>
+                <p>Тип ОС - <%- type %> (<%- arch %>)</p>
+                <p>Версия ОС - <%- release %></p>
+                <p>Имя хоста - <%- hostname %></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+          </div>
+        </div>
+      </div>
+</div>
+<% } %>
 <%- include('../_footer.ejs') %>

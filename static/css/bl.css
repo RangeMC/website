@@ -1,0 +1,34 @@
+@import "root.css";
+.h-bl h1,
+.h-bl p {
+    color: var(--txtcolor);
+}
+
+.h-bl .warning {
+    color: var(--warningcolor) !important;
+}
+
+.bl-list .bg-1 {
+    background-color: #1b1b1b;
+}
+
+.bl-list .bg-2 {
+    background-color: #222222;
+}
+
+.bl-list .bg-3 {
+    background-color: #333333;
+}
+
+.nav-item .active {
+    background-color: #121212 !important;
+    border-radius: 0 !important;
+}
+
+.nav-item .active .badge-warning {
+    background-color: #00848A !important;
+}
+
+.nav-link:hover {
+    color: white !important;
+}

@@ -1,16 +1,20 @@
 <%- include('_header.ejs', { title: `Ошибка ${error}`, userLogin: userLogin }) %>
-<div class="text-center">
-    <span class="white-color">
-        <div id="head" class="parallax">
-            <h1>RangeMC Project</h1>
-            <h3>Комплекс серверов Minecraft</h3>
+<section class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <h1 style="color: #F1FFA3;">СОЖАЛЕЮ!</h1>
+            <h3 style="color: #FFEEFF;">НО Я НЕ СМОГУ ЭТО СДЕЛАТЬ</h3>
+            <h5 style="color: #D5D5D5;"><%- errorProcessed %>
+            </h5>
+
+            <br><a href="/"><button type="button" class="btn btn-danger">На главную</button></a>
+            <a href="https://vk.com/rangemc" target="_blank"><button type="button" class="btn btn-primary">ВКонтакте</button></a>
         </div>
-        <br><div style="padding: 20px 20px 20px 20px; background-color: black; color: white;">
-            <p>
-                <%- errorProcessed %>
-            </p>
+        <div class="col-md-4">
+            <div class="images">
+                <img src="/static/img/404/1.png" width="100%" />
+            </div>
         </div>
-    </span>
-    <section id="banner" class="parallax"></section>
-</div>
+    </div>
+</section>
 <%- include('_footer.ejs') %>

@@ -1,50 +1,87 @@
-<footer>
-         <div class="footer">
-            <div class="copyright-notice">
-               <p>Made with <font color="red">❤</font> by <a target="_blank" href="https://vk.com/l3s1n">alexeylesin</a> and <a target="_blank" href="https://sqdsh.top">vlfz</a>.</font></p>
-            </div>
-         </div>
-      </footer>
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-      <script>
-         $(document).ready(function(){
-           $("a").on('click', function(event) {
-             if (this.hash !== "") {
-               event.preventDefault();
-               var hash = this.hash;
-               $('html, body').animate({
-                 scrollTop: $(hash).offset().top
-               }, 100, function(){
-                 window.location.hash = hash;
-               });
-             }
-           });
-         });
-      </script>
-      <script>
-         function myFunction() {
-             var x = document.getElementById("myTopnav");
-             if (x.className === "topnav") {
-                 x.className += " responsive";
-             } else {
-                 x.className = "topnav";
-             }
-         }
-      </script>
-      <script>
-         window.onscroll = function() {scrollFunction()};        
-         function scrollFunction() {
-             if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-                 document.getElementById("myBtn").style.display = "block";
-             } else {
-                 document.getElementById("myBtn").style.display = "none";
-             }
-         }
-         function topFunction() {
-             document.body.scrollTop = 0;
-             document.documentElement.scrollTop = 0;
-         }
-      </script>
-      <script src="/static/js/script.js"></script>
-   </body>
+<footer class="mt-auto">
+  <div class="footer">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-12">
+                  <center>
+                      <p style="font-size:24px;"><img src="/static/img/favicon.png" style="width: 80px;">RangeMC Project</p>
+                  </center>
+              </div>
+
+          </div>
+      </div>
+  </div>
+</footer>
+
+<script src="/static/js/main.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js "></script> -->
+
+
+
+<script>
+  $('.carousel').carousel({
+      interval: 3700
+  });
+</script>
+
+
+
+
+
+
+
+
+<script>
+  function scrollTo(to, duration = 700) {
+      const
+          element = document.scrollingElement || document.documentElement,
+          start = element.scrollTop,
+          change = to - start,
+          startDate = +new Date(),
+          // t = current time
+          // b = start value
+          // c = change in value
+          // d = duration
+          easeInOutQuad = function(t, b, c, d) {
+              t /= d / 2;
+              if (t < 1) return c / 2 * t * t + b;
+              t--;
+              return -c / 2 * (t * (t - 2) - 1) + b;
+          },
+          animateScroll = function() {
+              const currentDate = +new Date();
+              const currentTime = currentDate - startDate;
+              element.scrollTop = parseInt(easeInOutQuad(currentTime, start, change, duration));
+              if (currentTime < duration) {
+                  requestAnimationFrame(animateScroll);
+              } else {
+                  element.scrollTop = to;
+              }
+          };
+      animateScroll();
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+      let btn = document.querySelector('#toTop');
+      window.addEventListener('scroll', function() {
+          // Если прокрутили дальше 599px, показываем кнопку
+          if (pageYOffset > 100) {
+              btn.classList.add('show');
+              // Иначе прячем
+          } else {
+              btn.classList.remove('show');
+          }
+      });
+
+      // При клике прокручиываем на самый верх
+      btn.onclick = function(click) {
+          click.preventDefault();
+          scrollTo(0, 400);
+      }
+  });
+</script>
+</body>
+
 </html>

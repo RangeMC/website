@@ -1,0 +1,66 @@
+@import "root.css";
+@import "scroll.css";
+.abouts {
+    width: 100%;
+    background: var(--mainbgcolor);
+    padding-top: 22px;
+    /* padding-bottom: 55px; */
+}
+
+.abouts h2 {
+    color: var(--txtcolor);
+    /* text-transform: uppercase; */
+    font-size: 34px;
+    margin-bottom: 50px;
+    margin-top: 60px;
+}
+
+.abouts_row {
+    margin-bottom: 95px;
+}
+
+.about_col {
+    margin-bottom: 30px;
+}
+
+.about {
+    width: 100%;
+    height: 400px;
+    background: var(--bgcolor);
+    padding-top: 60px;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 57px;
+}
+
+.about_icon {
+    font-size: 61px;
+    width: 61px;
+    height: 61px;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--txtcolor);
+}
+
+.about_icon i {
+    width: 61px;
+    height: 61px;
+    font-size: 61px;
+}
+
+.about_text {
+    margin-top: 16px;
+}
+
+.about_text p {
+    color: var(--txtcolor);
+    font-size: 18px;
+}
+
+.about_title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--txtcolor);
+    padding-top: 21px;
+    margin-top: 0px;
+}

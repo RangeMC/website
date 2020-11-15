@@ -14,7 +14,8 @@ const mysql = require("mysql2").createPool({
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
-    connectTimeout: 604800000
+    connectTimeout: 604800000,
+    multipleStatements: true
 });
 
 exports.mysql = mysql;
@@ -79,26 +80,27 @@ app.get("/site-api/instanceStatus", (req, res) => {
 
 app.get("/discord", (req, res) => res.redirect(`https://discord.gg/dZ5bFGh`));
 app.get("/bans", (req, res) => {
-    mysql.query("SELECT * from punishments", (err, bans) => {
+    mysql.query("SELECT * from punishments WHERE type = 'BAN' OR type = 'TEMPBAN'", (err, bans) => {
         if(err) throw err;
+        mysql.query("SELECT * from punishments WHERE type = 'MUTE' OR type = 'TEMPMUTE'", (err, mutes) => {
+            if(err) throw err;
         mysql.query("SELECT * FROM punishments", (err, history) => {
             if(err) throw err;
-            return res.render("bans", { moment: moment, bans: bans, history: history, userLogin: req.cookies.userLogin || "Личный кабинет" });
+            return res.render("bans", { moment: moment, bans: bans, mutes: mutes, history: history, userLogin: req.cookies.userLogin || "Личный кабинет" });
         });
-    });
+      });
+   });
 });
-app.get("/launcher", (req, res) => {
-    res.render("launcher", { userLogin: req.cookies.userLogin || "Личный кабинет" });
-});   
 
 app.use((req, res, next) => {
-    res.status(404).render("error", { error: 404, errorProcessed: "Страница не найдена, дурашка. >:C", userLogin: req.cookies.userLogin || "Личный кабинет" });
+    res.status(404).render("error", { error: 404, errorProcessed: `Страница, которую вы ищите была <br>перемещена, удалена или её никогда <br> не существовало.`, userLogin: req.cookies.userLogin || "Личный кабинет" });
 });
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).render("error", { error: 500, errorProcessed: "Внутренняя ошибка сервера. Обратитесь в нашу группу ВКонтакте.", userLogin: req.cookies.userLogin || "Личный кабинет" });
+    res.status(500).render("error", { error: 500, errorProcessed: "Произошла внутренняя ошибка сервера, <br> обратитесь в нашу группу ВКонтакте.", userLogin: req.cookies.userLogin || "Личный кабинет" });
 });
 
 require("./discord");
+require("./vk");
 app.listen(process.env.PORT, () => console.log(`Да будет *:${process.env.PORT}!`));

@@ -24,6 +24,7 @@
         "mysql2": "^2.1.0",
         "node-vk-bot-api": "^3.3.4",
         "nodeactyl": "github:vlfz/Rangeactyl",
+        "os": "^0.1.1",
         "uuid": "^7.0.3"
     }
 }

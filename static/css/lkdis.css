@@ -1,0 +1,101 @@
+@import "root.css";
+@import "btn.css";
+.infos-block-height-1 {
+    background-color: var(--bgcolor);
+    width: 100%;
+    min-height: 175px;
+    border-radius: 8px;
+    color: var(--txtcolor);
+}
+
+.infos-block-height-2 {
+    background-color: var(--bgcolor);
+    width: 100%;
+    min-height: 200px;
+    border-radius: 8px;
+    color: var(--txtcolor);
+}
+
+.skins-block {
+    background-color: var(--bgcolor);
+    width: 100%;
+    min-height: 200px;
+    border-radius: 8px;
+}
+
+.text-warning {
+    color: #CD8D2E;
+    font-size: 17px;
+}
+
+.info-player ul li {
+    line-height: 15px;
+    list-style-type: none;
+}
+
+.info-player .nicks-block li:nth-child(1),
+.info-player .status-block li:nth-child(1),
+.info-player .password-block li:nth-child(1),
+.info-player .money-block li:nth-child(1) {
+    color: #BEC0C7;
+}
+
+
+/* player-list */
+
+.player-list {
+    overflow: auto;
+    background-color: var(--bgcolor);
+    color: var(--txtcolor);
+    border-radius: 8px;
+    height: 300px;
+}
+
+.table-dark {
+    background-color: var(--bgcolor) !important;
+}
+
+/* edit-user */
+
+.edit-user {
+    overflow: auto;
+    background-color: var(--bgcolor);
+    color: var(--txtcolor);
+    border-radius: 8px;
+    height: 800px;
+}
+
+/* launcher */
+
+.launcher-block {
+    text-transform: uppercase;
+    background-color: var(--bgcolor);
+    border-radius: 8px;
+    width: 100%;
+    min-height: 200px;
+    position: relative;
+}
+
+.launcher-text {
+    color: white;
+    font-weight: 500;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+}
+
+.launcher-text p span,
+.launcher-text ul li span {
+    color: #FF9100;
+}
+
+.launcher-text ul li {
+    list-style-type: none;
+}
+
+.launcher-block .launcher-text a,
+.launcher-text p span:nth-child(2) {
+    color: #00A1A8 !important;
+}

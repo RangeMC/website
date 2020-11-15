@@ -1,82 +1,119 @@
-<%- include('_header.ejs', { title: `Бан-лист сервера`, userLogin: userLogin }) %>
-<div class="text-center">
-    <span class="white-color">
-        <div id="head" class="parallax">
-            <h1>RangeMC Project</h1>
-            <h3>Комплекс серверов Minecraft</h3>
-        </div>
-        <br><div style="padding: 20px 20px 20px 20px; background-color: black; color: white;" class="w-70 mx-auto window breakpoint-768-i">
-        <h5>Список наказаний</h5>
-        <br><div class="table table-responsive">
-            <div class="table-header">
-                <div class="table-row">
-                    <div style="color: white;" class="table-cell-resp">ID</div>
-                    <div style="color: white;" class="table-cell">ID</div>
-                    <div style="color: white;" class="table-cell-resp">Тип</div>
-                    <div style="color: white;" class="table-cell">Тип</div>
-                    <div style="color: white;" class="table-cell-resp">Никнейм нарушителя</div>
-                    <div style="color: white;" class="table-cell">Никнейм нарушителя</div>
-                    <div style="color: white;" class="table-cell-resp">Никнейм модератора</div>
-                    <div style="color: white;" class="table-cell">Никнейм модератора</div>
-                    <div style="color: white;" class="table-cell-resp">Пункт правил</div>
-                    <div style="color: white;" class="table-cell">Пункт правил</div>
-                    <div style="color: white;" class="table-cell-resp">Комментарий</div>
-                    <div style="color: white;" class="table-cell">Комментарий</div>
-                    <div style="color: white;" class="table-cell-resp">Начало наказания</div>
-                    <div style="color: white;" class="table-cell">Начало наказания</div>
-                    <div style="color: white;" class="table-cell-resp">Конец наказания</div>
-                    <div style="color: white;" class="table-cell">Конец наказания</div>
-                </div>
-            </div>
+<%- include('_header.ejs', { title: `Банлист`, userLogin: userLogin }) %>
+<section class="container mb-5">
+  <div class="h-bl">
+      <div class="row">
+          <div class="col-md-4">
+              <img src="/static/img/Group 2.png" alt="" width="90%">
+          </div>
+          <div class="col-md-8">
+              <div class="text-center">
+                  <h1>Привет!</h1>
+                  <p>Вы пришли во вкладку банлист. В данной вкладке вы сможете просмотреть список игроков, которые получили наказание на нашем проекте.</p>
+                  <p class="warning">Соблюдайте пожалуйста правила!</p>
+              </div>
+          </div>
+      </div>
+  </div>
+</section>
 
-            <div class="table-body">
-                <% bans.forEach((user) => { %>
-                  <% if (user.time == 0) { %>
-                    <% var perm = "никогда"; %>
-                    <% } else { %>
-                      <% var enddate = moment(new Date(Number(user.time))).utcOffset(3).locale('ru').format('lll'); %>
-                      <% } %>
-                      <% if (user.type == "BAN") { %>
-                        <% var type = "бан"; %>
-                        <% }%>
-                        <% if (user.type == "TEMPBAN") { %>
-                          <% var type = "вр. бан"; %>
-                          <% }%>
-                          <% if (user.type == "MUTE") { %>
-                            <% var type = "мут"; %>
-                            <% }%>
-                            <% if (user.type == "TEMPMUTE") { %>
-                              <% var type = "вр. мут"; %>
-                              <% }%>
-                          <% if (user.reason == null) { %>
-                            <% var srvundef = "неизвестно"; %>
-                            <% }%>
-                              <% if (user.admin == "CONSOLE") { %>
-                                <% var srvconsole = "консоль"; %>
-                                  <% }%>
-                    <div class="table-row">
-                        <div style="background-color: black; color: white;" class="table-cell-resp">ID</div>
-                        <div style="background-color: black; color: white;" class="table-cell"><%- user.id || "N/D" %></div>
-                        <div style="background-color: black; color: white;" class="table-cell-resp">Тип</div>
-                        <div style="background-color: black; color: white;" class="table-cell"><%- type || "неизвестно" %></div>
-                        <div style="background-color: black; color: white;" class="table-cell-resp">Никнейм нарушителя</div>
-                        <div style="background-color: black; color: white;" class="table-cell"><%- user.username || "неизвестно" %></div>
-                        <div style="background-color: black; color: white;" class="table-cell-resp">Никнейм модератора</div>
-                        <div style="background-color: black; color: white;" class="table-cell"><%- srvconsole || user.admin || "неизвестно" %></div>
-                        <div style="background-color: black; color: white;" class="table-cell-resp">Пункт правил</div>
-                        <div style="background-color: black; color: white;" class="table-cell"><%- user.reason || "неизвестно" %></div>
-                        <div style="background-color: black; color: white;" class="table-cell-resp">Комментарий</div>
-                        <div style="background-color: black; color: white;" class="table-cell"><%- user.comment || "неизвестно" %></div>
-                        <div style="background-color: black; color: white;" class="table-cell-resp">Начало наказания</div>
-                        <div style="background-color: black; color: white;" class="table-cell"><%- moment(new Date(Number(user.expire))).utcOffset(3).locale('ru').format('lll') || "неизвестно" %></div>
-                        <div style="background-color: black; color: white;" class="table-cell-resp">Конец наказания</div>
-                        <div style="background-color: black; color: white;" class="table-cell"><%- perm || enddate || "неизвестно" %></div>
-                    </div>
-                <% }); %>
-            </div>
-            </div>
-        </div>
-    </span>
-    <section id="banner" class="parallax"></section>
-</div>
+<section class="container">
+  <div class="bl-list">
+      <ul class="nav nav-justified nav-pills mb-2" id="pills-tab" role="tablist">
+          <li class="nav-item bg-1">
+              <a class="nav-link active" id="pills-mute-tab" data-toggle="pill" href="#pills-mute" role="tab" aria-controls="pills-mute" aria-selected="true">МУТЫ <% /* %><span class="badge badge-warning">4<% */ %></span></a>
+          </li>
+          <li class="nav-item bg-2">
+              <a class="nav-link" id="pills-bans-tab" data-toggle="pill" href="#pills-bans" role="tab" aria-controls="pills-bans" aria-selected="false">БАНЫ <% /* %><span class="badge badge-warning">4<% */ %></span></a>
+          </li>
+      </ul>
+      <div class="tab-content" id="pills-tabContent">
+
+          <div class="tab-pane fade show active" id="pills-mute" role="tabpanel" aria-labelledby="pills-mute-tab">
+              <div class="player-list p-4 mb-5">
+                  <table class="table table-dark table-hover table-borderless text-center p-4">
+                      <thead>
+                          <tr>
+                              <th>ID</th>
+                              <th>ИГРОК</th>
+                              <th>ЗАКНУТ</th>
+                              <th>ПРИЧИНА</th>
+                              <th>КОММЕНТАРИЙ</th>
+                              <th>ВРЕМЯ ПОЛУЧЕНИЯ</th>
+                              <th>ВРЕМЯ ОКОНЧАНИЯ</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                        <% mutes.forEach((user) => { %>
+                          <% if (user.time == 0) { %>
+                            <% var perm = "никогда"; %>
+                            <% } else { %>
+                              <% var enddate = moment(new Date(Number(user.time))).utcOffset(3).locale('ru').format('lll'); %>
+                              <% } %>
+                                  <% if (user.reason == null) { %>
+                                    <% var srvundef = "неизвестно"; %>
+                                    <% }%>
+                                      <% if (user.admin == "CONSOLE") { %>
+                                        <% var srvconsole = "консоль"; %>
+                                          <% }%>
+                          <tr>
+                              <td><%- user.id || "N/D" %></td>
+                              <td><%- user.username || "неизвестно" %></td>
+                              <td><%- srvconsole || user.admin || "неизвестно" %></td>
+                              <td><%- user.reason || "неизвестно" %></td>
+                              <td><%- user.comment || "неизвестно" %></td>
+                              <td><%- moment(new Date(Number(user.expire))).utcOffset(3).locale('ru').format('lll') || "неизвестно" %></td>
+                              <td><%- perm || enddate || "неизвестно" %></td>
+                          </tr>
+                          <% }); %>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+          <div class="tab-pane fade" id="pills-bans" role="tabpanel" aria-labelledby="pills-bans-tab">
+              <div class="player-list p-4 mb-5">
+                  <table class="table table-dark table-hover table-borderless text-center p-4">
+                      <thead>
+                          <tr>
+                              <th>ID</th>
+                              <th>ИГРОК</th>
+                              <th>ЗАБАНЕН</th>
+                              <th>ПРАВИЛО</th>
+                              <th>КОММЕНТАРИЙ</th>
+                              <th>ВРЕМЯ ПОЛУЧЕНИЯ</th>
+                              <th>ВРЕМЯ ОКОНЧАНИЯ</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                        <% bans.forEach((user) => { %>
+                          <% if (user.time == 0) { %>
+                            <% var perm = "никогда"; %>
+                            <% } else { %>
+                              <% var enddate = moment(new Date(Number(user.time))).utcOffset(3).locale('ru').format('lll'); %>
+                              <% } %>
+                                  <% if (user.reason == null) { %>
+                                    <% var srvundef = "неизвестно"; %>
+                                    <% }%>
+                                      <% if (user.admin == "CONSOLE") { %>
+                                        <% var srvconsole = "консоль"; %>
+                                          <% }%>
+                          <tr>
+                              <td><%- user.id || "N/D" %></td>
+                              <td><%- user.username || "неизвестно" %></td>
+                              <td><%- srvconsole || user.admin || "неизвестно" %></td>
+                              <td><%- user.reason || "неизвестно" %></td>
+                              <td><%- user.comment || "неизвестно" %></td>
+                              <td><%- moment(new Date(Number(user.expire))).utcOffset(3).locale('ru').format('lll') || "неизвестно" %></td>
+                              <td><%- perm || enddate || "неизвестно" %></td>
+                          </tr>
+                          <% }); %>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+
+
+      </div>
+  </div>
+
+</section>
 <%- include('_footer.ejs') %>
