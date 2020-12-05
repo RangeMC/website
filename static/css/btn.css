@@ -11,14 +11,21 @@
 }
 
 .btn-password {
-    background-color: #0DB4BE !important;
+    background-color: #cc7700 !important;
+    color: var(--txtcolor) !important;
+    border-radius: 25px !important;
+    font-size: 14px !important;
+}
+
+.btn-donate {
+    background-color: #218f00 !important;
     color: var(--txtcolor) !important;
     border-radius: 25px !important;
     font-size: 14px !important;
 }
 
 .btn-cape {
-    background-color: #E02394 !important;
+    background-color: #BD27B9 !important;
     color: var(--txtcolor) !important;
     border-radius: 25px !important;
     font-size: 14px !important;

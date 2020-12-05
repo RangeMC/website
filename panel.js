@@ -75,7 +75,10 @@ const args = {
     SuccessPasswordChange: "<h1 style='color: #33FF00;'>УСПЕШНО!</h1><h3 style='color: #FFEEFF;'>ВЫ СМЕНИЛИ ПАРОЛЬ К <br> ВАШЕМУ АККАУНТУ</h3>",
     SuccessSkinChange: "<h1 style='color: #33FF00;'>УСПЕШНО!</h1><h3 style='color: #FFEEFF;'>ВЫ СМЕНИЛИ СКИН <br> ВАШЕГО АККАУНТА</h3>",
     SuccessCloakChange: "<h1 style='color: #33FF00;'>УСПЕШНО!</h1><h3 style='color: #FFEEFF;'>ВЫ СМЕНИЛИ ПЛАЩ <br> ВАШЕГО АККАУНТА</h3>",
-    AccessDenied: "<h1 style='color: #F1FFA3;'>СОЖАЛЕЮ!</h1><h3 style='color: #FFEEFF;'>У ВАС НЕТ ДОСТУПА К <br> ДАННОЙ СТРАНИЦЕ</h3>"
+    AccessDenied: "<h1 style='color: #F1FFA3;'>СОЖАЛЕЮ!</h1><h3 style='color: #FFEEFF;'>У ВАС НЕТ ДОСТУПА К <br> ДАННОЙ СТРАНИЦЕ</h3>",
+    DonateError: "<h1 style='color: #F1FFA3;'>СОЖАЛЕЮ!</h1><h3 style='color: #FFEEFF;'>ПРОИЗОШЛА ОШИБКА <br> ПРИ ПОКУПКЕ ДОНАТА</h3>",
+    DonatePending: "<h1 style='color: #F1FFA3;'>ОЖИДАЙТЕ!</h1><h3 style='color: #FFEEFF;'>ВАШ ПЛАТЁЖ <br> ПРИНЯТ В ОБРАБОТКУ</h3>",
+    DonateSuccess: "<h1 style='color: #33FF00;'>УСПЕШНО!</h1><h3 style='color: #FFEEFF;'>СПАСИБО ЗА <br> ПОКУПКУ ДОНАТА</h3>"
 };
 
 function errorProcess(error) {
@@ -119,8 +122,9 @@ router.get("/", (req, res) => {
                         let hostname = os.hostname();
                         let cpus = os.cpus();
                         let release = os.release();
+                        let shop_id = process.env.SHOP_ID;
                         return index.mysql.promise().query("SELECT * FROM accounts")
-                        .then((accounts) => res.render("panel/index", { release: release, cpus: cpus, arch: arch, platform: platform, type: type, hostname: hostname, account: user[0][0], accounts: accounts[0], moment: moment, bans: bans, userGroup: userGroup, userGroups: userGroups, userLogin: req.cookies.userLogin || "Личный кабинет" }));
+                        .then((accounts) => res.render("panel/index", { shop_id: shop_id, release: release, cpus: cpus, arch: arch, platform: platform, type: type, hostname: hostname, account: user[0][0], accounts: accounts[0], moment: moment, bans: bans, userGroup: userGroup, userGroups: userGroups, userLogin: req.cookies.userLogin || "Личный кабинет" }));
                     });
             }
         }).catch(console.error);
