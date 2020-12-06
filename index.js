@@ -1,29 +1,59 @@
-require("dotenv").config();
-const Nodeactyl = require('nodeactyl');
-const instance = Nodeactyl.Client;
+const fs = require('fs');
 
-let accessToStatusAPI;
-instance.login(process.env.PANEL_CLIENT, process.env.PANEL_CLIENT_KEY, (logged_in, msg) => {
-    if(logged_in == true) accessToStatusAPI = true;
-    else accessToStatusAPI = false;
+if (!fs.existsSync('./config.yml')) {
+    fs.writeFileSync('./config.yml', `
+app:
+    port: 3000 # порт вебсервера
+    shop_id: '' # ID магазина TradeMC
+
+mysql:
+    host: localhost
+    port: 3306
+    user: ''
+    password: ''
+    database: ''
+
+alert:
+    enabled: false
+    type: primary # достуные варианты - primary (голубой), success (зелёный), danger (красный)
+    text: '' # текст новости
+    link: '' # ссылка на новость
+
+discord:
+    enabled: false
+    prefix: '!' # префикс бота
+    token: '' # токен бота
+
+vkbot:
+    enabled: false
+    token: '' # токен бота
+    group_id: '' # ID группы ВК
+`, function (err) {
+  if (err) return console.log(err);
+  console.log('Файл конфигурации успешно создан!');
+  console.log('Пожалуйста, заполните все данные в config.yml.');
+  process.exit();
 });
+}
 
-const mysql = require("mysql2").createPool({
-    host: process.env.MYSQL_HOST,
-    port: process.env.MYSQL_PORT,
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE,
-    connectTimeout: 604800000,
-    multipleStatements: true
-});
-
-exports.mysql = mysql;
-
+const config = require('config-yml');
 const moment = require("moment");
 const express = require("express");
 const app = express();
 const cors = require('cors');
+
+const mysql = require("mysql2").createPool({
+    host: config.mysql.host,
+    port: config.mysql.port,
+    user: config.mysql.user,
+    password: config.mysql.password,
+    database: config.mysql.database,
+    connectTimeout: 604800000,
+    multipleStatements: true
+});
+
+exports.config = config;
+exports.mysql = mysql;
 
 app.use(cors());
 app.options('*', cors());
@@ -38,47 +68,10 @@ app.use("/skin", require("./skins"));
 app.use("/cloak", require("./cloaks"));
 
 app.get("/", (req, res) => {
-    res.render("index", { userLogin: req.cookies.userLogin || "Личный кабинет" });
+    res.render("index", { config: config, userLogin: req.cookies.userLogin || "Личный кабинет" });
 });
 
-app.get("/site-api/instanceStatus", (req, res) => {
-    if(accessToStatusAPI == false) return res.status(500).json({
-        error: {
-            code: 500,
-            error: "Internal Server Error",
-            message: "Внутренняя ошибка сервера. Скорее всего, панель RangeMC недоступна, или API-ключ был удалён."
-        }
-    });
-
-    return instance.getAllServers().then(async (r) => {
-        let data = [];
-        for (let server of r) {
-            data.push({
-                uuid: server.attributes.uuid,
-                name: server.attributes.name,
-                node: server.attributes.node
-            });
-        }
-
-        for (let server of data) {
-            let status = await instance.getServerStatus(server.uuid);
-            server.status = status.current_state;
-        }
-
-        return res.status(200).json(data);
-    }).catch(e => {
-        console.error(e.stack);
-        return res.status(500).json({
-            error: {
-                code: 500,
-                error: "Internal Server Error",
-                message: "Внутренняя ошибка сервера. Скорее всего, панель RangeMC недоступна, или API-ключ был удалён."
-            }
-        });
-    });
-});
-
-app.get("/discord", (req, res) => res.redirect(`https://discord.gg/dZ5bFGh`));
+app.get("/discord", (req, res) => res.redirect(`https://discord.rangemc.ovh`));
 app.get("/bans", (req, res) => {
     mysql.query("SELECT * from punishments WHERE type = 'BAN' OR type = 'TEMPBAN'", (err, bans) => {
         if(err) throw err;
@@ -86,7 +79,7 @@ app.get("/bans", (req, res) => {
             if(err) throw err;
         mysql.query("SELECT * FROM punishments", (err, history) => {
             if(err) throw err;
-            return res.render("bans", { moment: moment, bans: bans, mutes: mutes, history: history, userLogin: req.cookies.userLogin || "Личный кабинет" });
+            return res.render("bans", { config: config, moment: moment, bans: bans, mutes: mutes, history: history, userLogin: req.cookies.userLogin || "Личный кабинет" });
         });
       });
    });
@@ -101,6 +94,10 @@ app.use((err, req, res, next) => {
     res.status(500).render("error", { error: 500, errorProcessed: "Произошла внутренняя ошибка сервера, <br> обратитесь в нашу группу ВКонтакте.", userLogin: req.cookies.userLogin || "Личный кабинет" });
 });
 
-require("./discord");
-require("./vk");
-app.listen(process.env.PORT, () => console.log(`Да будет *:${process.env.PORT}!`));
+if (config.discord.enabled == true) {
+    require("./discord");
+}
+if (config.vkbot.enabled == true) {
+    require("./vk");
+}
+app.listen(config.app.port, () => console.log(`Да будет *:${config.app.port}!`));

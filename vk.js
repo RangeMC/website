@@ -28,18 +28,10 @@ const checkGroup = async (ctx, group, callback) => {
     return callback({ user, lpData });
 };
 
-const Nodeactyl = require('nodeactyl');
-const instance = Nodeactyl.Client;
-
-instance.login(process.env.PANEL_CLIENT, process.env.PANEL_CLIENT_KEY, (logged_in, msg) => {
-    if(logged_in == false) console.error(`* Ошибка подключения к ${process.env.PANEL_CLIENT} | ${msg}`);
-    else console.info(`* Успешное подключение к панели управления серверами`);
-});
-
 const VkBot = require("node-vk-bot-api");
 const bot = new VkBot({
-    token: process.env.VK_TOKEN,
-    group_id: process.env.VK_GROUP_ID,
+    token: index.config.vkbot.token,
+    group_id: index.config.vkbot.group_id,
     execute_timeout: 50,
     polling_timeout: 25
 });
@@ -48,9 +40,9 @@ bot.on((ctx) => {
     const messageContent = String(ctx.message.body || ctx.message.text);
     // const messageAuthorID = String(ctx.message.from_id || ctx.message.user_id);
 
-    if(!messageContent.startsWith(process.env.PREFIX)) return;
+    if(!messageContent.startsWith(index.config.discord.prefix)) return;
 
-	const args = messageContent.slice(process.env.PREFIX.length).split(/ +/);
+	const args = messageContent.slice(index.config.discord.prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
 	
 	if(command == "help") {

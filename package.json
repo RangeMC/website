@@ -1,6 +1,6 @@
 {
     "name": "rangemc.ovh",
-    "version": "1.0.6",
+    "version": "4.4.0",
     "description": "Сайт для сервера RangeMC",
     "main": "index.js",
     "scripts": {
@@ -8,8 +8,9 @@
         "test": "nodemon ."
     },
     "author": "cipherskyinc",
-    "license": "Unlicense",
+    "license": "MIT",
     "dependencies": {
+        "config-yml": "^0.10.3",
         "cookie-parser": "^1.4.5",
         "cors": "^2.8.5",
         "discord.js": "^11.5.1",
@@ -18,12 +19,11 @@
         "express": "^4.17.1",
         "express-recaptcha": "^5.0.2",
         "md5": "^2.3.0",
-        "modern-rcon": "^1.0.3",
         "moment": "^2.24.0",
         "multer": "^1.4.2",
         "mysql2": "^2.1.0",
         "node-vk-bot-api": "^3.3.4",
-        "nodeactyl": "github:vlfz/Rangeactyl",
+        "node-yaml-config": "0.0.6",
         "os": "^0.1.1",
         "uuid": "^7.0.3"
     }

@@ -89,13 +89,6 @@ function eventProcess(arg) {
     return args[arg];
 }
 
-const RCON = require("./rcon");
-const rcon = new RCON({
-    host: process.env.MYSQL_HOST,
-    port: process.env.RCON_PORT,
-    password: process.env.RCON_PASSWORD
-});
-
 const router = express.Router();
 router.use(require("cookie-parser")());
 router.use(express.json());
@@ -122,9 +115,10 @@ router.get("/", (req, res) => {
                         let hostname = os.hostname();
                         let cpus = os.cpus();
                         let release = os.release();
-                        let shop_id = process.env.SHOP_ID;
+                        let shop_id = index.config.app.shop_id;
+                        let config = index.config;
                         return index.mysql.promise().query("SELECT * FROM accounts")
-                        .then((accounts) => res.render("panel/index", { shop_id: shop_id, release: release, cpus: cpus, arch: arch, platform: platform, type: type, hostname: hostname, account: user[0][0], accounts: accounts[0], moment: moment, bans: bans, userGroup: userGroup, userGroups: userGroups, userLogin: req.cookies.userLogin || "Личный кабинет" }));
+                        .then((accounts) => res.render("panel/index", { config: config, shop_id: shop_id, release: release, cpus: cpus, arch: arch, platform: platform, type: type, hostname: hostname, account: user[0][0], accounts: accounts[0], moment: moment, bans: bans, userGroup: userGroup, userGroups: userGroups, userLogin: req.cookies.userLogin || "Личный кабинет" }));
                     });
             }
         }).catch(console.error);
@@ -145,8 +139,9 @@ router.get("/data", (req, res) => {
                     .catch(console.error);
                     index.mysql.query("SELECT * FROM punishments WHERE username = ? AND type = 'BAN' OR type = 'TEMPBAN' LIMIT 1", [user[0][0].login], (err, bans) => {
                         if(err) throw err;
+                        let config = index.config;
                         return index.mysql.promise().query("SELECT * FROM accounts")
-                        .then((accounts) => res.render("panel/data", { account: user[0][0], userGroup: userGroup, userGroups: userGroups, userLogin: req.cookies.userLogin || "Личный кабинет" }));
+                        .then((accounts) => res.render("panel/data", { config: config, account: user[0][0], userGroup: userGroup, userGroups: userGroups, userLogin: req.cookies.userLogin || "Личный кабинет" }));
                 });
         }
     }).catch(console.error);
@@ -216,8 +211,9 @@ router.get("/admin/:login", (req, res) => {
                 else return index.mysql.promise().query("SELECT * FROM accounts WHERE login = ?", [req.params.login])
                     .then(async (accounts) => {
                         let playerGroup = await index.mysql.promise().query("SELECT * FROM luckperms_players WHERE username = ?", [req.params.login.toLowerCase()]);
+                        let config = index.config;
                         if(["admin"].includes(playerGroup[0][0].primary_group)) return res.redirect("/panel/event?type=AccessDenied");
-                        else return res.render("panel/userEdit", { playerGroup: playerGroup, account: accounts[0][0], userLogin: req.cookies.userLogin || "Личный кабинет" });
+                        else return res.render("panel/userEdit", { config: config, playerGroup: playerGroup, account: accounts[0][0], userLogin: req.cookies.userLogin || "Личный кабинет" });
                     }).catch(console.error);
             }
         }).catch(console.error);
@@ -282,7 +278,8 @@ router.get("/deleteUser", (req, res) => {
 });
 
 router.get("/event", (req, res) => {
-    res.render("panel/event", { type: eventProcess(req.query.type), userLogin: req.cookies.userLogin || "Личный кабинет" });
+    let config = index.config;
+    res.render("panel/event", { config: config, type: eventProcess(req.query.type), userLogin: req.cookies.userLogin || "Личный кабинет" });
 });
 
 router.post("/skin", (req, res, next) => {
@@ -368,8 +365,9 @@ router.post("/password", (req, res) => {
 router.get("/login", (req, res) => {
     if(req.cookies.loginHash) return res.redirect("/panel");
     else {
-        if(req.query.error) return res.render("panel/login", { error: errorProcess(req.query.error), userLogin: req.cookies.userLogin || "Личный кабинет" });
-        else return res.render("panel/login", { error: null, userLogin: req.cookies.userLogin || "Личный кабинет" });
+        let config = index.config;
+        if(req.query.error) return res.render("panel/login", { config: config, error: errorProcess(req.query.error), userLogin: req.cookies.userLogin || "Личный кабинет" });
+        else return res.render("panel/login", { config: config, error: null, userLogin: req.cookies.userLogin || "Личный кабинет" });
     }
 });
 
@@ -397,8 +395,9 @@ router.post("/login", (req, res) => {
 router.get("/register", (req, res) => {
     if(req.cookies.loginHash) return res.redirect("/panel");
     else {
-        if(req.query.error) return res.render("panel/register", { error: errorProcess(req.query.error), captcha: recaptcha.render(), userLogin: req.cookies.userLogin || "Личный кабинет" });
-        else return res.render("panel/register", { error: null, captcha: recaptcha.render(), userLogin: req.cookies.userLogin || "Личный кабинет" });
+        let config = index.config;
+        if(req.query.error) return res.render("panel/register", { config: config, error: errorProcess(req.query.error), captcha: recaptcha.render(), userLogin: req.cookies.userLogin || "Личный кабинет" });
+        else return res.render("panel/register", { config: config, error: null, captcha: recaptcha.render(), userLogin: req.cookies.userLogin || "Личный кабинет" });
     }
 });
 

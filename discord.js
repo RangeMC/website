@@ -4,7 +4,7 @@ const { Client, RichEmbed } = require("discord.js");
 const client = new Client();
 
 client.on("ready", () => {
-    client.user.setPresence({ game: { type: 3, name: (process.env.PREFIX + "verify") } });
+    client.user.setPresence({ game: { type: 3, name: (index.config.discord.prefix + "verify") } });
     return console.info(`Бот Discord запущен.`);
 });
 
@@ -24,11 +24,11 @@ client.on('voiceStateUpdate', (Old, New) => {
     if(New.user.bot) return;
     if(Old.user.bot) return;
 
-    if(New.voiceChannelID == voiceConfig.voiceID) {
-        New.guild.createChannel(New.user.username, { type: "voice", parent: voiceConfig.categoryID })
+    if(New.voiceChannelID == voiceindex.config.voiceID) {
+        New.guild.createChannel(New.user.username, { type: "voice", parent: voiceindex.config.categoryID })
             .then((set) => {
-                set.overwritePermissions(New.user, voiceConfig.permissions[0]);
-                set.overwritePermissions(New.guild.id, voiceConfig.permissions[1]);
+                set.overwritePermissions(New.user, voiceindex.config.permissions[0]);
+                set.overwritePermissions(New.guild.id, voiceindex.config.permissions[1]);
             
                 return New.setVoiceChannel(New.guild.channels.get(set.id)).catch((err) => set.delete());
             });
@@ -36,8 +36,8 @@ client.on('voiceStateUpdate', (Old, New) => {
 
     if(Old.voiceChannel) {
         let filter = (ch) =>
-            (ch.parentID == voiceConfig.categoryID)
-            && (ch.id !== voiceConfig.voiceID)
+            (ch.parentID == voiceindex.config.categoryID)
+            && (ch.id !== voiceindex.config.voiceID)
             && (Old.voiceChannelID == ch.id)
             && (Old.voiceChannel.members.size == 0);
         
@@ -56,9 +56,9 @@ client.on("guildMemberAdd", (member) => {
 });
 
 client.on("message", (message) => {
-    if(!message.content.startsWith(process.env.PREFIX) || message.author.bot) return;
+    if(!message.content.startsWith(index.config.discord.prefix) || message.author.bot) return;
 
-	const args = message.content.slice(process.env.PREFIX.length).split(/ +/);
+	const args = message.content.slice(index.config.discord.prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
 	
 	if(command == "userinfo") {
@@ -104,7 +104,7 @@ client.on("message", (message) => {
                 .setColor("#7289DA")
                 .setAuthor("Верификация на сервере RangeMC", client.user.displayAvatarURL)
                 .setDescription(`Для того чтобы верифицироваться на сервере **RangeMC**, вы должны отдать мне свой ключ сессии.`)
-                .addField("Как отдать этот ключ?", `Пропиши в данном диалоге \`${process.env.PREFIX + command} <ключ>\`.`)
+                .addField("Как отдать этот ключ?", `Пропиши в данном диалоге \`${index.config.discord.prefix + command} <ключ>\`.`)
                 .addField("Где получить ключ?", `Вы должны быть авторизованным в нашем ЛК.\nСам ключ указан на этой странице: **<https://rangemc.ovh/panel/data>**`);
 
             return message.delete().then(() => message.author.send(embed).catch((err) => message.channel.send(`:warning: | ${message.author}, откройте свои личные сообщения!`)));
@@ -112,4 +112,4 @@ client.on("message", (message) => {
     }
 });
 
-client.login(process.env.TOKEN);
+client.login(index.config.discord.token);
