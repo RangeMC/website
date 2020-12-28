@@ -1,8 +1,5 @@
 <br />
 <p align="center">
-  <a href="https://rangemc.ovh">
-    <img src="/static/img/icon.png" alt="Logo" width="80" height="80">
-  </a>
 
   <h3 align="center">Сайт RangeMC</h3>
 
